@@ -1,6 +1,6 @@
 <?xml version="1.0"?> 
 
-<!DOCTYPE overlay SYSTEM "chrome://join/locale/join.dtd">
+<!DOCTYPE overlay SYSTEM "chrome://join-ng/locale/join-ng.dtd">
 
 <?xml-stylesheet href="chrome://communicator/skin/" type="text/css"?>
 

@@ -36,8 +36,7 @@
 //////////////////////////////////////////////////
 function MyDump( sMsg )
 {
-	var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch);
-	if ( prefs.getBoolPref("join-ng.debug") == true ) {
+	if ( Services.prefs.getBoolPref("join-ng.debug") == true ) {
 		dump(sMsg);
 	}
 }
@@ -333,10 +332,8 @@ var Join = {
 			sTbHead += "X-Account-Key: " + oAccount.key + "\n";
 		}
 		
-		// 設定ダイアログの設定を取得し、
-		// [元のメッセージからメッセージヘッダを補完する] が有効の場合のみ処理をおこなう
-		var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch);
-		if ( prefs.getBoolPref("join-ng.fill") == true ) {
+		// Fill new message header from original messages if enabled
+		if ( Services.prefs.getBoolPref("join-ng.fill") == true ) {
 			// 旧い (結合前の) メッセージのメッセージヘッダを取得する
 			// このメッセージヘッダは最後に結合されたメッセージ、
 			// すなわち number と total とが一致しているメッセージのメッセージヘッダとなる

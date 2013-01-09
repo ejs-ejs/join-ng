@@ -1,0 +1,34 @@
+<?xml version="1.0"?> 
+
+<!DOCTYPE overlay SYSTEM "chrome://join/locale/join.dtd">
+
+<?xml-stylesheet href="chrome://communicator/skin/" type="text/css"?>
+
+<dialog xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+	onload="initJoinNGPanel();"
+	buttons="accept, cancel"
+	ondialogaccept="updateJoinNGPrefs();"
+	title="&JoinNGOptionTitle;">
+
+	<script type="application/x-javascript">
+		<![CDATA[
+			function initJoinNGPanel()
+			{
+				var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch);
+				document.getElementById("JoinNGFill").checked = prefs.getBoolPref("join-ng.fill");
+			}
+
+			function updateJoinNGPrefs()
+			{
+				var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch);
+				prefs.setBoolPref("join-ng.fill", document.getElementById("JoinNGFill").checked);
+			}
+		]]>
+	</script>
+
+	<groupbox>
+		<caption label="&JoinNGGenerateOptionLabel;"/>
+		<checkbox id="JoinNGFill" label="&JoinNGFillLabel;"/>
+		<spacer height="6"/>
+	</groupbox>
+</dialog>

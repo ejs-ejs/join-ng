@@ -1,0 +1,5 @@
+<!-- Labels -->
+<!ENTITY join-ng.label "Join">
+<!ENTITY JoinNGOptionTitle "Join Options">
+<!ENTITY JoinNGGenerateOptionLabel "Generating Options">
+<!ENTITY JoinNGFillLabel "Fill message header from original">

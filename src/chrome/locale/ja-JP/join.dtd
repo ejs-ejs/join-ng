@@ -1,0 +1,5 @@
+<!-- Labels -->
+<!ENTITY join-ng.label "選択したメッセージを結合">
+<!ENTITY JoinNGOptionTitle "Join 設定">
+<!ENTITY JoinNGGenerateOptionLabel "メッセージ生成オプション">
+<!ENTITY JoinNGFillLabel "元のメッセージからメッセージヘッダを補完する">

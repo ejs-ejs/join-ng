@@ -91,35 +91,9 @@ var Join = {
 		return 0;
 	},
 	
-	
-	//////////////////////////////////////////////////
-	///  Return 0. On error return -1.
-	//////////////////////////////////////////////////
-	Join : function ()
+
+	ProcessMIME : function (sMsgUriLst, nMsgCnt)
 	{
-		MyDump("==============================\n");
-		MyDump("## Start join process\n");
-		
-		MyDump("------------------------------\n");
-		MyDump("## Get selected messages\n");
-		
-		// Get URIs of selected messages
-		var sMsgUriLst = gFolderDisplay.selectedMessageUris;
-		
-		// Abort if less than 2 messages selected
-		if ( ( ! sMsgUriLst ) || ( sMsgUriLst.length < 2 ) ) {
-			MyDump("Too few messages ... abort\n");
-			MyDump("==============================\n");
-			
-			var sErrMsg = document.getElementById('JoinNGBundle').getString('TooFewMessages');
-			alert(sErrMsg);
-			return -1;
-		}
-		
-		MyDump("------------------------------\n");
-		MyDump("## Get message infomation\n");
-		
-		var nMsgCnt = sMsgUriLst.length;
 		var oMsgInfoLst = new Array(nMsgCnt);
 		var nMsgIdx = 0;
 		
@@ -139,11 +113,7 @@ var Join = {
 				MyDump("Message No." + nMsgIdx + ": " + e + " ... abort\n");
 				MyDump("==============================\n");
 				
-				var sErrMsg = document.getElementById('JoinNGBundle').getString('MissingContentType');
-				var sErrDtl = "nMsgIdx=" + nMsgIdx + "\n" +
-				              "sMsgHead=" + sMsgHead;
-				alert(sErrMsg + "\n\n" + e + "\n" + sErrDtl);
-				return -1;
+				return null;
 			}
 			
 			// Check if Content-Type is message/partial (case insensitive)
@@ -155,7 +125,7 @@ var Join = {
 				var sErrDtl = "nMsgIdx=" + nMsgIdx + "\n" +
 				              "sMsgType=" + sMsgType;
 				alert(sErrMsg + "\n\n" + sErrDtl);
-				return -1;
+				return null;
 			}
 			
 			// Get message/partial fields info (case insensitive)
@@ -182,7 +152,7 @@ var Join = {
 				var sErrDtl = "nMsgIdx=" + nMsgIdx + "\n" +
 				              "sMsgType=" + sMsgType;
 				alert(sErrMsg + "\n\n" + e + "\n" + sErrDtl);
-				return -1;
+				return null;
 			}
 			
 			MyDump("Message No." + nMsgIdx + ": " +
@@ -218,11 +188,13 @@ var Join = {
 			var sErrDtl = "nMsgCnt=" + nMsgCnt + "\n" +
 			              "nTotal=" + nTotal;
 			alert(sErrMsg + "\n\n" + sErrDtl);
-			return -1;
+			return null;
 		}
 		
 		// Check if all messages have the same Message-ID
+		// while checking also build new sorted UriLst
 		var sId = oMsgInfoLst[0].id;
+		var oMsgSortedUriLst = new Array(nMsgCnt);
 		MyDump("<List cnt=" + nMsgCnt + ">\n");
 		for ( nMsgIdx = 0; nMsgIdx < nMsgCnt; nMsgIdx++ ) {
 			if ( oMsgInfoLst[nMsgIdx].id != sId ) {
@@ -235,12 +207,48 @@ var Join = {
 				              "sId=" + sId + "\n" +
 				              "oMsgInfoLst[nMsgIdx].id=" + oMsgInfoLst[nMsgIdx].id;
 				alert(sErrMsg + "\n\n" + sErrDtl);
-				return -1;
+				return null;
 			}
 			
+			oMsgSortedUriLst[nMsgIdx] = oMsgInfoLst[nMsgIdx].uri;
 			MyDump("Message No." + nMsgIdx + ": OK\n");
 		}
+		return oMsgSortedUriLst;
+	},
+	
+	//////////////////////////////////////////////////
+	///  Return 0. On error return -1.
+	//////////////////////////////////////////////////
+	Join : function ()
+	{
+		MyDump("==============================\n");
+		MyDump("## Start join process\n");
 		
+		MyDump("------------------------------\n");
+		MyDump("## Get selected messages\n");
+		
+		// Get URIs of selected messages
+		var sMsgUriLst = gFolderDisplay.selectedMessageUris;
+		
+		// Abort if less than 2 messages selected
+		if ( ( ! sMsgUriLst ) || ( sMsgUriLst.length < 2 ) ) {
+			MyDump("Too few messages ... abort\n");
+			MyDump("==============================\n");
+			
+			var sErrMsg = document.getElementById('JoinNGBundle').getString('TooFewMessages');
+			alert(sErrMsg);
+			return -1;
+		}
+		
+		MyDump("------------------------------\n");
+		MyDump("## Get message infomation\n");
+	
+		var nMsgCnt = sMsgUriLst.length;
+
+		var sMsgSortedUriLst = this.ProcessMIME(sMsgUriLst, nMsgCnt);
+		if (sMsgSortedUriLst == null)
+			return -1;
+	
 		MyDump("------------------------------\n");
 		MyDump("## Join messages\n");
 		
@@ -250,7 +258,7 @@ var Join = {
 		for ( nMsgIdx = 0; nMsgIdx < nMsgCnt; nMsgIdx++ ) {
 			
 			// Get the message URI
-			var sMsgUri = oMsgInfoLst[nMsgIdx].uri;
+			var sMsgUri = sMsgSortedUriLst[nMsgIdx];
 			
 			// Get message body by URI
 			var sMsgData = this.GetMessage(sMsgUri);
@@ -296,11 +304,10 @@ var Join = {
 		
 		// Fill new message header from original messages if enabled
 		if ( Services.prefs.getBoolPref("join-ng.fill") == true ) {
-			// 旧い (結合前の) メッセージのメッセージヘッダを取得する
-			// このメッセージヘッダは最後に結合されたメッセージ、
-			// すなわち number と total とが一致しているメッセージのメッセージヘッダとなる
-			// また、FormHeader() によって <CRLF> が挿入されている
-			// sOldMsgHeadLst の各要素はヘッダごとに分割されている
+			// Get old message header from the first message
+			// Each line is split into sOldMsgHeadLst list
+			var sMsgData = this.GetHeader(sMsgSortedUriLst[0]);
+			var sMsgHead = this.FormHeader(sMsgData);
 			var sOldMsgHead = sMsgHead.replace(/\r\n/g, "\n");
 			sOldMsgHead = sOldMsgHead.replace(/\r/g, "\n");
 			var sOldMsgHeadLst = sOldMsgHead.split("\n");
@@ -417,38 +424,28 @@ var Join = {
 	},
 	
 	
-	//////////////////////////////////////////////////
-	///  メッセージヘッダを整形する
-	///  (引数)
-	///  sMsgData:String メッセージデータ(メッセージヘッダ[+本文])
-	///  (戻り値)
-	///  :String 整形されたメッセージヘッダ。
-	//////////////////////////////////////////////////
 	FormHeader : function ( sMsgData )
 	{
-		// 改行文字を変換 (統一) する
+		// Conver new-line characters
 		sMsgData = sMsgData.replace(/\r\n/g, "\n");
 		sMsgData = sMsgData.replace(/\r/g, "\n");
 		
-		// 文字列を行ごとに分割する
+		// Split data at each new-line
 		var sLineDataLst = sMsgData.split("\n");
 		
-		// すべての行に対して処理を繰り返す
-		var sLineIdx = 0;                    //行番号
-		var sLineCnt = sLineDataLst.length;  //行数
-		var sMsgHead = '';                   //メッセージヘッダ
+		var sLineIdx = 0;
+		var sLineCnt = sLineDataLst.length;
+		var sMsgHead = '';
 		for ( sLineIdx = 0; sLineIdx < sLineCnt; sLineIdx++ ) {
 			var sLineData = sLineDataLst[sLineIdx];
-			// 空行があったら、ヘッダの取得を終わる
+			// if it is empty line - end of header
 			if ( sLineData == '' ) {
 				break;
 			}
 			
-			// 戻り値の先頭へ余分な改行や <CRLF> を追加しない
-			// あっても問題ないがエレガントじゃない
+			// don't add new-line at the first line
 			if ( sMsgHead != '' ) {
-				// 複数行のパラメータを１行にまとめる
-				// パラメータの先頭の場合、直前に改行を置く
+				// if parameter one-line add new-line, if multi-line add <CRLF>
 				if ( sLineData.match("^[a-zA-Z0-9-]+: *.+") ) {
 					sMsgHead += "\n";
 				}
@@ -456,10 +453,6 @@ var Join = {
 					sMsgHead += '<CRLF>';
 				}
 			}
-			
-			// 水平タブを空白文字に変換する
-			// エラーメッセージ表示時の見栄えを考慮しての処理
-			//sMsgHead = sMsgHead.replace(/\t/g, " ");
 			
 			sMsgHead += sLineData;
 		}

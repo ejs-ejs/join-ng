@@ -54,14 +54,8 @@ var Join = {
 
 	
 	//////////////////////////////////////////////////
-	///  分割メッセージの並び替え用関数
-	///    (1) ID の昇順に並び替える
-	///    (2) ID が同じ場合、メッセージ番号の昇順に並び替える
-	///  (引数)
-	///  oLeft:PartMsgInfo  分割メッセージ情報
-	///  oRight:PartMsgInfo 分割メッセージ情報
-	///  (戻り値)
-	///  :Number 並び替えが必要な場合、正の数(1)。
+	///  Sort by PartMsgInfo
+	///  Return 1 if needs sorting, else -1.
 	//////////////////////////////////////////////////
 	SortPartMsgInfo : function ( oLeft, oRight )
 	{
@@ -81,11 +75,6 @@ var Join = {
 	},
 	
 	
-	//////////////////////////////////////////////////
-	///  メイン
-	///  (戻り値)
-	///  :Number 0。
-	//////////////////////////////////////////////////
 	Main : function ()
 	{
 		try {
@@ -104,60 +93,44 @@ var Join = {
 	
 	
 	//////////////////////////////////////////////////
-	///  結合する
-	///  (戻り値)
-	///  :Number 0。エラーにより中断した場合、 -1。
+	///  Return 0. On error return -1.
 	//////////////////////////////////////////////////
 	Join : function ()
 	{
-		// 結合処理を開始する
 		MyDump("==============================\n");
 		MyDump("## Start join process\n");
 		
-		// スレッドペインで選択されているメッセージを取得する
 		MyDump("------------------------------\n");
 		MyDump("## Get selected messages\n");
 		
-		// 選択されているメッセージの、メッセージ URI のリストを取得する
+		// Get URIs of selected messages
 		var sMsgUriLst = gFolderDisplay.selectedMessageUris;
 		
-		// メッセージが複数選択されていない場合、中断する
+		// Abort if less than 2 messages selected
 		if ( ( ! sMsgUriLst ) || ( sMsgUriLst.length < 2 ) ) {
 			MyDump("Too few messages ... abort\n");
 			MyDump("==============================\n");
 			
-			// エラーメッセージを表示して中断する
 			var sErrMsg = document.getElementById('JoinNGBundle').getString('TooFewMessages');
 			alert(sErrMsg);
 			return -1;
 		}
 		
-		
-		// 分割メッセージの情報を取得する
 		MyDump("------------------------------\n");
 		MyDump("## Get message infomation\n");
 		
-		// メッセージ URI リストの要素数を取得する
 		var nMsgCnt = sMsgUriLst.length;
-		// 分割メッセージ情報のリストを生成する
 		var oMsgInfoLst = new Array(nMsgCnt);
-		// メッセージ URI リストのインデクス
 		var nMsgIdx = 0;
 		
-		// メッセージ情報の取得と判別をおこなう
-		// この処理は、選択されているメッセージの数だけ繰り返す
+		// Get required info from all selected messages headers
 		MyDump("<List cnt=" + nMsgCnt + ">\n");
 		for ( nMsgIdx = 0; nMsgIdx < nMsgCnt; nMsgIdx++ ) {
-			
-			// メッセージ URI を取得する
 			var sMsgUri = sMsgUriLst[nMsgIdx];
-			
-			// メッセージ URI からメッセージヘッダを取得する
 			var sMsgData = this.GetHeader(sMsgUri);
 			var sMsgHead = this.FormHeader(sMsgData);
 			
-			// Content-Type を取得できない場合、中断する
-			// ただし、フィールド名の大文字小文字を区別しない
+			// Get Content-Type field (case insensitive)
 			var sMsgType = '';
 			try {
 				sMsgType = sMsgHead.match(/Content-Type: *(.+)/i)[1];
@@ -166,7 +139,6 @@ var Join = {
 				MyDump("Message No." + nMsgIdx + ": " + e + " ... abort\n");
 				MyDump("==============================\n");
 				
-				// エラーメッセージを表示して中断する
 				var sErrMsg = document.getElementById('JoinNGBundle').getString('MissingContentType');
 				var sErrDtl = "nMsgIdx=" + nMsgIdx + "\n" +
 				              "sMsgHead=" + sMsgHead;
@@ -174,13 +146,11 @@ var Join = {
 				return -1;
 			}
 			
-			// Content-Type が message/partial でない場合、中断する
-			// ただし、フィールド値の大文字小文字を区別しない
+			// Check if Content-Type is message/partial (case insensitive)
 			if ( ! sMsgType.match(/^message\/partial/i) ) {
 				MyDump("Message No." + nMsgIdx + ": Content-Type isn't 'message/partial' ... abort\n");
 				MyDump("==============================\n");
 				
-				// エラーメッセージを表示して中断する
 				var sErrMsg = document.getElementById('JoinNGBundle').getString('NotPartialMessage');
 				var sErrDtl = "nMsgIdx=" + nMsgIdx + "\n" +
 				              "sMsgType=" + sMsgType;
@@ -188,14 +158,13 @@ var Join = {
 				return -1;
 			}
 			
-			// message/partial メッセージのパラメータを取得できない場合、中断する
-			// ただし、フィールド値の大文字小文字を区別しない
-			// また、二重引用符に囲まれた文字列以外のパターンにも対応する
+			// Get message/partial fields info (case insensitive)
+			// support values not only in double quotes
 			oMsgInfoLst[nMsgIdx] = new this.PartMsgInfo();
 			try {
 				oMsgInfoLst[nMsgIdx].number = sMsgType.match(/number=([0-9]+)/i)[1];
 				oMsgInfoLst[nMsgIdx].total = sMsgType.match(/total=([0-9]+)/i)[1];
-				// Winbiff による、id が二重引用符に囲まれていないパターンにも対応する
+				
 				var oREResLst = sMsgType.match(/id=\"([^\"]+)\"|id=([^ \(\)<>@,;:\\\"\/\[\]\?=]+)(\(null\))?[;$]/i);
 				if ( oREResLst[1] ) {
 					oMsgInfoLst[nMsgIdx].id = oREResLst[1];
@@ -209,7 +178,6 @@ var Join = {
 				MyDump("Message No." + nMsgIdx + ": " + e + " ... abort\n");
 				MyDump("==============================\n");
 				
-				// エラーメッセージを表示して中断する
 				var sErrMsg = document.getElementById('JoinNGBundle').getString('MissingParameter');
 				var sErrDtl = "nMsgIdx=" + nMsgIdx + "\n" +
 				              "sMsgType=" + sMsgType;
@@ -227,7 +195,6 @@ var Join = {
 		MyDump("------------------------------\n");
 		MyDump("## Sort messages\n");
 		
-		// メッセージを並び替える
 		oMsgInfoLst.sort(this.SortPartMsgInfo);
 		
 		MyDump("<List cnt=" + nMsgCnt + ">\n");
@@ -254,7 +221,7 @@ var Join = {
 			return -1;
 		}
 		
-		// 分割メールがすべて揃っていない場合、中断する
+		// Check if all messages have the same Message-ID
 		var sId = oMsgInfoLst[0].id;
 		MyDump("<List cnt=" + nMsgCnt + ">\n");
 		for ( nMsgIdx = 0; nMsgIdx < nMsgCnt; nMsgIdx++ ) {
@@ -274,36 +241,31 @@ var Join = {
 			MyDump("Message No." + nMsgIdx + ": OK\n");
 		}
 		
-		
-		// 結合する
 		MyDump("------------------------------\n");
 		MyDump("## Join messages\n");
 		
-		// 結合メッセージデータ
 		var sMsgBody = '';
 		
 		MyDump("<List cnt=" + nMsgCnt + ">\n");
 		for ( nMsgIdx = 0; nMsgIdx < nMsgCnt; nMsgIdx++ ) {
 			
-			// メッセージ URI を取得する
+			// Get the message URI
 			var sMsgUri = oMsgInfoLst[nMsgIdx].uri;
 			
-			// メッセージ URI からメッセージ本文を取得し結合する
+			// Get message body by URI
 			var sMsgData = this.GetMessage(sMsgUri);
 			sMsgBody += this.GetBody(sMsgData);
 			
 			MyDump("Message No." + nMsgIdx + ": done\n");
 		}
 		
-		
-		// 現在のフォルダへ追加する
 		MyDump("------------------------------\n");
 		MyDump("## Add new message\n");
 		
-		// おまじない
+		// Current folder we are in
 		var oMsgFolder = gFolderDisplay.displayedFolder;
 		
-		// IMAP アカウント、またはニュースグループアカウントのフォルダの場合、中断する
+		// We can't create messages in IMAP or newsgroup folders
 		if ( (oMsgFolder.server.type == "imap") || (oMsgFolder.server.type == "nntp") ) {
 			// Create folder where we can store joined messages
 			let rootMsgFolder = GetDefaultAccountRootFolder();
@@ -314,12 +276,12 @@ var Join = {
 		
 		var oMsgLocalFolder = oMsgFolder.QueryInterface(Components.interfaces.nsIMsgLocalMailFolder);
 		
-		// Thunderbird のメッセージヘッダを生成する
+		// Thunderbird message header
 		var sTbHead = '';
 		// From
 		var oNow = new Date;
 		sTbHead += "From - " + oNow.toString() + "\n";
-		// X-Mozilla-Status と X-Mozilla-Status2
+		// X-Mozilla-Status and X-Mozilla-Status2
 		if ( sMsgBody.indexOf("X-Mozilla-Status") < 0 ) {
 			sTbHead += "X-Mozilla-Status: 0001\n" +
 			           "X-Mozilla-Status2: 00000000\n";
@@ -414,7 +376,7 @@ var Join = {
 			}
 		}
 		
-		// Thunderbirdのメッセージヘッダをメッセージ本文に結合する
+		// add Thunderbird header to the message body
 		sMsgBody = sTbHead + "\n" + this.GetBody(sMsgBody) + "\n";
 		
 		var oMsgHead = oMsgLocalFolder.addMessage(sMsgBody);
@@ -432,27 +394,23 @@ var Join = {
 	
 	
 	//////////////////////////////////////////////////
-	///  メッセージデータからメッセージ本文を取得する
-	///  (引数)
-	///  sMsgData:String メッセージデータ(メッセージヘッダ+本文)
-	///  (戻り値)
-	///  :String メッセージ本文。エラーにより中断した場合、空文字列。
+	///  Returns empty string on failure
 	//////////////////////////////////////////////////
 	GetBody : function ( sMsgData )
 	{
-		// 改行文字を変換する
+		// Conver new-line characters
 		sMsgData = sMsgData.replace(/\r\n/g, "\n");
 		sMsgData = sMsgData.replace(/\r/g, "\n");
 		
-		// 最初の空行の位置を取得する
+		// Get location of first empty line
 		var nMsgSplitter = sMsgData.indexOf("\n\n");
 		
-		// 空行がない場合、空白文字列を返す
+		// Abort if no empty line
 		if ( nMsgSplitter == -1 ) {
 			return '';
 		}
 		
-		// 最初の空行より後ろの文字列を取得する
+		// Get string below this empty line
 		var sMsgBody = sMsgData.substr(nMsgSplitter + "\n\n".length);
 		
 		return sMsgBody;

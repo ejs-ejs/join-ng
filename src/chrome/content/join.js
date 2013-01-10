@@ -52,7 +52,12 @@ var Join = {
 		this.uri = uri;
 	},
 
-	
+	OldOEMsgInfo : function ( subject, uri )
+	{
+		this.subject = subject;
+		this.uri = uri;
+	},
+
 	//////////////////////////////////////////////////
 	///  Sort by PartMsgInfo
 	///  Return 1 if needs sorting, else -1.
@@ -74,6 +79,13 @@ var Join = {
 		}
 	},
 	
+	SortOldOEMsgInfo : function ( oLeft, oRight )
+	{
+		if ( oLeft.subject > oRight.subject )
+			return 1;
+
+		return -1;
+	},
 	
 	Main : function ()
 	{
@@ -216,6 +228,36 @@ var Join = {
 		return oMsgSortedUriLst;
 	},
 	
+	ProcessOldOE : function (sMsgUriLst, nMsgCnt)
+	{
+		var oOldOEMsgInfoLst = new Array(nMsgCnt);
+
+		// Get required info from all selected messages headers
+		MyDump("<List cnt=" + nMsgCnt + ">\n");
+		for ( nMsgIdx = 0; nMsgIdx < nMsgCnt; nMsgIdx++ ) {
+			var msgUri = sMsgUriLst[nMsgIdx];
+			var msgHdr = messenger.msgHdrFromURI(msgUri);
+			oOldOEMsgInfoLst[nMsgIdx] = new this.OldOEMsgInfo();
+
+			oOldOEMsgInfoLst[nMsgIdx].uri = msgUri;
+			oOldOEMsgInfoLst[nMsgIdx].subject = msgHdr.subject;
+		}
+
+		MyDump("------------------------------\n");
+		MyDump("## Sort messages\n");
+
+		oOldOEMsgInfoLst.sort(this.SortOldOEMsgInfo);
+
+		var oMsgSortedUriLst = new Array(nMsgCnt);
+		MyDump("<List cnt=" + nMsgCnt + ">\n");
+		for ( nMsgIdx = 0; nMsgIdx < nMsgCnt; nMsgIdx++ ) {
+			MyDump("Message subject:" + oOldOEMsgInfoLst[nMsgIdx].subject + "\n");
+			oMsgSortedUriLst[nMsgIdx] = oOldOEMsgInfoLst[nMsgIdx].uri;
+		}
+
+		return oMsgSortedUriLst;
+	},
+
 	//////////////////////////////////////////////////
 	///  Return 0. On error return -1.
 	//////////////////////////////////////////////////
@@ -246,8 +288,12 @@ var Join = {
 		var nMsgCnt = sMsgUriLst.length;
 
 		var sMsgSortedUriLst = this.ProcessMIME(sMsgUriLst, nMsgCnt);
-		if (sMsgSortedUriLst == null)
-			return -1;
+		if (sMsgSortedUriLst == null) {
+			// Maybe this message is from old OE and has no MIME info?
+			sMsgSortedUriLst = this.ProcessOldOE(sMsgUriLst, nMsgCnt);
+			if (sMsgSortedUriLst == null)
+				return -1;
+		}
 	
 		MyDump("------------------------------\n");
 		MyDump("## Join messages\n");

@@ -552,15 +552,7 @@ var Join = {
 		return sMsgHead;
 	},
 	
-	//////////////////////////////////////////////////
-	///  メッセージ URI からメッセージデータを取得する
-	///  (引数)
-	///  sMsgUri:String  メッセージ URI
-	///  nDataCnt:Number データ量 (Optional)
-	///  (戻り値)
-	///  :String メッセージデータ。エラーにより中断した場合、空文字列。
-	//////////////////////////////////////////////////
-	GetMessage : function ( sMsgUri, nDataCnt )
+	GetMessage : function ( sMsgUri )
 	{
 		// おまじない
 		var oMsgStream = Components.classes["@mozilla.org/network/sync-stream-listener;1"].createInstance();
@@ -584,14 +576,8 @@ var Join = {
 		var sMsgData = '';
 		oScrInStream.available();
 		
-		// データ量が指定されていない場合、全データを取得する
-		if ( ( nDataCnt == null ) || ( nDataCnt == 0 )) {
-			while ( oScrInStream.available() ) {
-				sMsgData += oScrInStream.read(1000);
-			}
-		}
-		else {
-			sMsgData += oScrInStream.read(nDataCnt);
+		while ( oScrInStream.available() ) {
+			sMsgData += oScrInStream.read(1000);
 		}
 		
 		return sMsgData;

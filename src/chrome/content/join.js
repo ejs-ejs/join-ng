@@ -255,6 +255,22 @@ var Join = {
 			oMsgSortedUriLst[nMsgIdx] = oOldOEMsgInfoLst[nMsgIdx].uri;
 		}
 
+		MyDump("------------------------------\n");
+		MyDump("## Check messages\n");
+
+		/*
+		 * First message must have "begin 666" and the last one "end"
+		 */
+		var sMsgData = this.GetMessage(oOldOEMsgInfoLst[0].uri);
+		var sMsgBody = this.GetBody(sMsgData);
+		if (sMsgBody.indexOf("begin 666") == -1)
+			return null;
+
+		sMsgData = this.GetMessage(oOldOEMsgInfoLst[nMsgCnt - 1].uri);
+		sMsgBody = this.GetBody(sMsgData);
+		if (sMsgBody.indexOf("end") == -1)
+			return null;
+
 		return oMsgSortedUriLst;
 	},
 
@@ -291,8 +307,11 @@ var Join = {
 		if (sMsgSortedUriLst == null) {
 			// Maybe this message is from old OE and has no MIME info?
 			sMsgSortedUriLst = this.ProcessOldOE(sMsgUriLst, nMsgCnt);
-			if (sMsgSortedUriLst == null)
+			if (sMsgSortedUriLst == null) {
+				var sErrMsg = document.getElementById('JoinNGBundle').getString('InvalidMessages');
+				alert(sErrMsg);
 				return -1;
+			}
 		}
 	
 		MyDump("------------------------------\n");

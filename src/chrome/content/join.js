@@ -274,6 +274,25 @@ var Join = {
 		return oMsgSortedUriLst;
 	},
 
+	GetLocalFolder : function ()
+	{
+		// Current folder we are in
+		var oMsgFolder = gFolderDisplay.displayedFolder;
+		
+		// We can't create messages in IMAP, newsgroup or messanger folders
+		if ( (oMsgFolder.server.type == "imap") || (oMsgFolder.server.type == "nntp") || (oMsgFolder.server.type == "im") ) {
+			// We should be able to store messages in "Local Folders/Joined"
+			var acctMgr = Components.classes["@mozilla.org/messenger/account-manager;1"].getService(Components.interfaces.nsIMsgAccountManager); 
+			let localMsgFolder = acctMgr.localFoldersServer.rootMsgFolder;
+			// Create "Joined" folder if there is no such folder yet
+			if (!localMsgFolder.containsChildNamed("Joined"))
+				localMsgFolder.createSubfolder("Joined", null);
+			oMsgFolder = localMsgFolder.getChildNamed("Joined");
+		}
+
+		return oMsgFolder;
+	},
+
 	//////////////////////////////////////////////////
 	///  Return 0. On error return -1.
 	//////////////////////////////////////////////////
@@ -336,17 +355,7 @@ var Join = {
 		MyDump("## Add new message\n");
 		
 		// Current folder we are in
-		var oMsgFolder = gFolderDisplay.displayedFolder;
-		
-		// We can't create messages in IMAP or newsgroup folders
-		if ( (oMsgFolder.server.type == "imap") || (oMsgFolder.server.type == "nntp") ) {
-			// Create folder where we can store joined messages
-			let rootMsgFolder = GetDefaultAccountRootFolder();
-			if (!rootMsgFolder.containsChildNamed("Joined"))
-				rootMsgFolder.createSubfolder("Joined", null);
-			oMsgFolder = rootMsgFolder.getChildNamed("Joined");
-		}
-		
+		var oMsgFolder = this.GetLocalFolder();
 		var oMsgLocalFolder = oMsgFolder.QueryInterface(Components.interfaces.nsIMsgLocalMailFolder);
 		
 		// Thunderbird message header

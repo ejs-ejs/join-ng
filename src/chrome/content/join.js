@@ -32,11 +32,11 @@
 ///  Displays debug info on console.
 ///  To enable debug you have to set following variables:
 ///    browser.dom.window.dump.enabled = true
-///    join-ng.debug = true
+///    extensions.join-ng.debug = true
 //////////////////////////////////////////////////
 function MyDump( sMsg )
 {
-	if ( Services.prefs.getBoolPref("join-ng.debug") == true ) {
+	if ( Services.prefs.getBoolPref("extensions.join-ng.debug") == true ) {
 		dump(sMsg);
 	}
 }
@@ -377,7 +377,7 @@ var Join = {
 		}
 		
 		// Fill new message header from original messages if enabled
-		if ( Services.prefs.getBoolPref("join-ng.fill") == true ) {
+		if ( Services.prefs.getBoolPref("extensions.join-ng.fill") == true ) {
 			// Get old message header from the first message
 			// Each line is split into sOldMsgHeadLst list
 			var sMsgData = this.GetHeader(sMsgSortedUriLst[0]);

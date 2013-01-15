@@ -15,13 +15,13 @@
 			function initJoinNGPanel()
 			{
 				var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch);
-				document.getElementById("JoinNGFill").checked = prefs.getBoolPref("join-ng.fill");
+				document.getElementById("JoinNGFill").checked = prefs.getBoolPref("extensions.join-ng.fill");
 			}
 
 			function updateJoinNGPrefs()
 			{
 				var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch);
-				prefs.setBoolPref("join-ng.fill", document.getElementById("JoinNGFill").checked);
+				prefs.setBoolPref("extensions.join-ng.fill", document.getElementById("JoinNGFill").checked);
 			}
 		]]>
 	</script>

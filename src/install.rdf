@@ -11,6 +11,7 @@
 		<em:description>Restore message/partial messages.</em:description>
 		<em:creator>Paulius Zaleckas</em:creator>
 		<em:developer>Munekazu SHINKAI</em:developer>
+		<em:translator>Eugenijus Januškevičius</em:translator>
 		<em:homepageURL>https://github.com/pauliuszaleckas/join-ng</em:homepageURL>
 		<em:optionsURL>chrome://join-ng/content/joinOptions.xul</em:optionsURL>
 

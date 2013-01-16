@@ -471,7 +471,7 @@ var Join = {
 		
 		MyDump("## It's done, Hooray!\n");
 		MyDump("==============================\n");
-		
+
 		return 0;
 	},
 	

@@ -3,3 +3,4 @@
 <!ENTITY JoinNGOptionTitle "Join Options">
 <!ENTITY JoinNGGenerateOptionLabel "Generating Options">
 <!ENTITY JoinNGFillLabel "Fill message header from original">
+<!ENTITY JoinNGFolderLabel "Folder name for joined messages">

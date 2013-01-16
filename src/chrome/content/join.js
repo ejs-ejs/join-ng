@@ -278,16 +278,18 @@ var Join = {
 	{
 		// Current folder we are in
 		var oMsgFolder = gFolderDisplay.displayedFolder;
-		
+
 		// We can't create messages in IMAP, newsgroup or messanger folders
 		if ( (oMsgFolder.server.type == "imap") || (oMsgFolder.server.type == "nntp") || (oMsgFolder.server.type == "im") ) {
+			// Get localized folder name
+			var sFolderName = Services.prefs.getComplexValue("extensions.join-ng.folder", Components.interfaces.nsIPrefLocalizedString).data;
 			// We should be able to store messages in "Local Folders/Joined"
 			var acctMgr = Components.classes["@mozilla.org/messenger/account-manager;1"].getService(Components.interfaces.nsIMsgAccountManager); 
 			let localMsgFolder = acctMgr.localFoldersServer.rootMsgFolder;
 			// Create "Joined" folder if there is no such folder yet
-			if (!localMsgFolder.containsChildNamed("Joined"))
-				localMsgFolder.createSubfolder("Joined", null);
-			oMsgFolder = localMsgFolder.getChildNamed("Joined");
+			if (!localMsgFolder.containsChildNamed(sFolderName))
+				localMsgFolder.createSubfolder(sFolderName, null);
+			oMsgFolder = localMsgFolder.getChildNamed(sFolderName);
 		}
 
 		return oMsgFolder;

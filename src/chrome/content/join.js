@@ -44,6 +44,8 @@ function MyDump( sMsg )
 
 var Join = {
 
+	mStatusFeedback: null,
+
 	PartMsgInfo : function ( number, total, id, uri )
 	{
 		this.id = id;
@@ -91,12 +93,15 @@ var Join = {
 	{
 		try {
 			window.setCursor('wait');
+			this.mStatusFeedback = msgWindow.statusFeedback;
+			this.mStatusFeedback.startMeteors();
 			this.Join();
 		}
 		catch ( e ) {
 			MyDump("!!!! Exception: " + e + "\n");
 		}
 		finally {
+			this.mStatusFeedback.stopMeteors();
 			window.setCursor('auto');
 		}
 		
@@ -302,6 +307,8 @@ var Join = {
 	{
 		MyDump("==============================\n");
 		MyDump("## Start join process\n");
+
+		this.mStatusFeedback.showStatusString(document.getElementById('JoinNGBundle').getString('JoinInProgress'));
 		
 		MyDump("------------------------------\n");
 		MyDump("## Get selected messages\n");

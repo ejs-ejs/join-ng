@@ -1,7 +1,7 @@
 ﻿//////////////////////////////////////////////////
 ///
 ///  Joins partial messages
-///  
+///
 ///  Copyright (c) 2007-2010 Munekazu SHINKAI
 ///  Copyright (c) 2013 Paulius Zaleckas
 ///			<paulius.zaleckas@gmail.com>
@@ -72,7 +72,7 @@ var Join = {
 		else if ( oLeft.id < oRight.id ) {
 			return -1;
 		}
-		
+
 		if ( Number(oLeft.number) > Number(oRight.number) ) {
 			return 1;
 		}
@@ -80,7 +80,7 @@ var Join = {
 			return -1;
 		}
 	},
-	
+
 	SortOldOEMsgInfo : function ( oLeft, oRight )
 	{
 		if ( oLeft.subject > oRight.subject )
@@ -88,7 +88,7 @@ var Join = {
 
 		return -1;
 	},
-	
+
 	Main : function ()
 	{
 		try {
@@ -104,23 +104,23 @@ var Join = {
 			this.mStatusFeedback.stopMeteors();
 			window.setCursor('auto');
 		}
-		
+
 		return 0;
 	},
-	
+
 
 	ProcessMIME : function (sMsgUriLst, nMsgCnt)
 	{
 		var oMsgInfoLst = new Array(nMsgCnt);
 		var nMsgIdx = 0;
-		
+
 		// Get required info from all selected messages headers
 		MyDump("<List cnt=" + nMsgCnt + ">\n");
 		for ( nMsgIdx = 0; nMsgIdx < nMsgCnt; nMsgIdx++ ) {
 			var sMsgUri = sMsgUriLst[nMsgIdx];
 			var sMsgData = this.GetHeader(sMsgUri);
 			var sMsgHead = this.FormHeader(sMsgData);
-			
+
 			// Get Content-Type field (case insensitive)
 			var sMsgType = '';
 			try {
@@ -129,29 +129,29 @@ var Join = {
 			catch ( e ) {
 				MyDump("Message No." + nMsgIdx + ": " + e + " ... abort\n");
 				MyDump("==============================\n");
-				
+
 				return null;
 			}
-			
+
 			// Check if Content-Type is message/partial (case insensitive)
 			if ( ! sMsgType.match(/^message\/partial/i) ) {
 				MyDump("Message No." + nMsgIdx + ": Content-Type isn't 'message/partial' ... abort\n");
 				MyDump("==============================\n");
-				
+
 				var sErrMsg = document.getElementById('JoinNGBundle').getString('NotPartialMessage');
 				var sErrDtl = "nMsgIdx=" + nMsgIdx + "\n" +
 				              "sMsgType=" + sMsgType;
 				alert(sErrMsg + "\n\n" + sErrDtl);
 				return null;
 			}
-			
+
 			// Get message/partial fields info (case insensitive)
 			// support values not only in double quotes
 			oMsgInfoLst[nMsgIdx] = new this.PartMsgInfo();
 			try {
 				oMsgInfoLst[nMsgIdx].number = sMsgType.match(/number=([0-9]+)/i)[1];
 				oMsgInfoLst[nMsgIdx].total = sMsgType.match(/total=([0-9]+)/i)[1];
-				
+
 				var oREResLst = sMsgType.match(/id=\"([^\"]+)\"|id=([^ \(\)<>@,;:\\\"\/\[\]\?=]+)(\(null\))?[;$]/i);
 				if ( oREResLst[1] ) {
 					oMsgInfoLst[nMsgIdx].id = oREResLst[1];
@@ -164,26 +164,26 @@ var Join = {
 			catch ( e ) {
 				MyDump("Message No." + nMsgIdx + ": " + e + " ... abort\n");
 				MyDump("==============================\n");
-				
+
 				var sErrMsg = document.getElementById('JoinNGBundle').getString('MissingParameter');
 				var sErrDtl = "nMsgIdx=" + nMsgIdx + "\n" +
 				              "sMsgType=" + sMsgType;
 				alert(sErrMsg + "\n\n" + e + "\n" + sErrDtl);
 				return null;
 			}
-			
+
 			MyDump("Message No." + nMsgIdx + ": " +
 			       "number=" + oMsgInfoLst[nMsgIdx].number + ", " +
 			       "total=" + oMsgInfoLst[nMsgIdx].total + ", " +
 			       "id=" + oMsgInfoLst[nMsgIdx].id + "\n");
 		}
-		
-		
+
+
 		MyDump("------------------------------\n");
 		MyDump("## Sort messages\n");
-		
+
 		oMsgInfoLst.sort(this.SortPartMsgInfo);
-		
+
 		MyDump("<List cnt=" + nMsgCnt + ">\n");
 		for ( nMsgIdx = 0; nMsgIdx < nMsgCnt; nMsgIdx++ ) {
 			MyDump("Message No." + nMsgIdx + ": " +
@@ -191,23 +191,23 @@ var Join = {
 			       "total=" + oMsgInfoLst[nMsgIdx].total + ", " +
 			       "id=" + oMsgInfoLst[nMsgIdx].id + "\n");
 		}
-		
+
 		MyDump("------------------------------\n");
 		MyDump("## Check messages\n");
-		
+
 		// Check if we have all the messages
 		var nTotal = oMsgInfoLst[0].total;
 		if ( nMsgCnt != nTotal ) {
 			MyDump("The number of selected messages doesn't match the 'total' of the parameter for 'message/partial' ... abort\n");
 			MyDump("==============================\n");
-			
+
 			var sErrMsg = document.getElementById('JoinNGBundle').getString('UnmatchTotal');
 			var sErrDtl = "nMsgCnt=" + nMsgCnt + "\n" +
 			              "nTotal=" + nTotal;
 			alert(sErrMsg + "\n\n" + sErrDtl);
 			return null;
 		}
-		
+
 		// Check if all messages have the same Message-ID
 		// while checking also build new sorted UriLst
 		var sId = oMsgInfoLst[0].id;
@@ -217,7 +217,7 @@ var Join = {
 			if ( oMsgInfoLst[nMsgIdx].id != sId ) {
 				MyDump("Message No." + nMsgIdx + ": Invalid Message-ID ... abort\n");
 				MyDump("==============================\n");
-				
+
 				// エラーメッセージを表示して中断する
 				var sErrMsg = document.getElementById('JoinNGBundle').getString('UnmatchMessageID');
 				var sErrDtl = "nMsgIdx=" + nMsgIdx + "\n" +
@@ -226,13 +226,13 @@ var Join = {
 				alert(sErrMsg + "\n\n" + sErrDtl);
 				return null;
 			}
-			
+
 			oMsgSortedUriLst[nMsgIdx] = oMsgInfoLst[nMsgIdx].uri;
 			MyDump("Message No." + nMsgIdx + ": OK\n");
 		}
 		return oMsgSortedUriLst;
 	},
-	
+
 	ProcessOldOE : function (sMsgUriLst, nMsgCnt)
 	{
 		var oOldOEMsgInfoLst = new Array(nMsgCnt);
@@ -289,7 +289,7 @@ var Join = {
 			// Get localized folder name
 			var sFolderName = Services.prefs.getComplexValue("extensions.join-ng.folder", Components.interfaces.nsIPrefLocalizedString).data;
 			// We should be able to store messages in "Local Folders/Joined"
-			var acctMgr = Components.classes["@mozilla.org/messenger/account-manager;1"].getService(Components.interfaces.nsIMsgAccountManager); 
+			var acctMgr = Components.classes["@mozilla.org/messenger/account-manager;1"].getService(Components.interfaces.nsIMsgAccountManager);
 			let localMsgFolder = acctMgr.localFoldersServer.rootMsgFolder;
 			// Create "Joined" folder if there is no such folder yet
 			if (!localMsgFolder.containsChildNamed(sFolderName))
@@ -309,26 +309,26 @@ var Join = {
 		MyDump("## Start join process\n");
 
 		this.mStatusFeedback.showStatusString(document.getElementById('JoinNGBundle').getString('JoinInProgress'));
-		
+
 		MyDump("------------------------------\n");
 		MyDump("## Get selected messages\n");
-		
+
 		// Get URIs of selected messages
 		var sMsgUriLst = gFolderDisplay.selectedMessageUris;
-		
+
 		// Abort if less than 2 messages selected
 		if ( ( ! sMsgUriLst ) || ( sMsgUriLst.length < 2 ) ) {
 			MyDump("Too few messages ... abort\n");
 			MyDump("==============================\n");
-			
+
 			var sErrMsg = document.getElementById('JoinNGBundle').getString('TooFewMessages');
 			alert(sErrMsg);
 			return -1;
 		}
-		
+
 		MyDump("------------------------------\n");
 		MyDump("## Get message infomation\n");
-	
+
 		var nMsgCnt = sMsgUriLst.length;
 
 		var sMsgSortedUriLst = this.ProcessMIME(sMsgUriLst, nMsgCnt);
@@ -341,12 +341,12 @@ var Join = {
 				return -1;
 			}
 		}
-	
+
 		MyDump("------------------------------\n");
 		MyDump("## Join messages\n");
-		
+
 		var sMsgBody = '';
-		
+
 		MyDump("<List cnt=" + nMsgCnt + ">\n");
 		for ( nMsgIdx = 0; nMsgIdx < nMsgCnt; nMsgIdx++ ) {
 			// Get the message URI
@@ -362,14 +362,14 @@ var Join = {
 
 			MyDump("Message No." + nMsgIdx + ": done\n");
 		}
-		
+
 		MyDump("------------------------------\n");
 		MyDump("## Add new message\n");
-		
+
 		// Current folder we are in
 		var oMsgFolder = this.GetLocalFolder();
 		var oMsgLocalFolder = oMsgFolder.QueryInterface(Components.interfaces.nsIMsgLocalMailFolder);
-		
+
 		// Thunderbird message header
 		var sTbHead = '';
 		// From
@@ -387,7 +387,7 @@ var Join = {
 			var oAccount = oAccountMng.FindAccountForServer(oMsgFolder.server);
 			sTbHead += "X-Account-Key: " + oAccount.key + "\n";
 		}
-		
+
 		// Fill new message header from original messages if enabled
 		if ( Services.prefs.getBoolPref("extensions.join-ng.fill") == true ) {
 			// Get old message header from the first message
@@ -398,7 +398,7 @@ var Join = {
 			sOldMsgHead = sOldMsgHead.replace(/\r/g, "\n");
 			var sOldMsgHeadLst = sOldMsgHead.split("\n");
 			var nOldMsgHeadCnt = sOldMsgHeadLst.length;
-			
+
 			// 新しい (結合後の) メッセージのメッセージヘッダを取得する
 			// このメッセージヘッダは FormHeader() によって <CRLF> が挿入されている
 			// sNewMsgHeadLst の各要素はヘッダごとに分割されている
@@ -407,7 +407,7 @@ var Join = {
 			sNewMsgHead = sNewMsgHead.replace(/\r/g, "\n");
 			var sNewMsgHeadLst = sNewMsgHead.split("\n");
 			var nNewMsgHeadCnt = sNewMsgHeadLst.length;
-			
+
 			// メッセージヘッダをマージする
 			var nOldMsgHeadIdx = 0;
 			var nNewMsgHeadIdx = 0;
@@ -420,32 +420,32 @@ var Join = {
 				if ( ! ( oMatchs = sOldMsgHeadLst[nOldMsgHeadIdx].match(/^([a-zA-Z0-9-]+?): *(.+)\n?$/) ) ) {
 					continue;
 				}
-				
+
 				// ヘッダの値がない場合、そのヘッダを無効にして次へ
 				if ( this.Trim(oMatchs[2]) == "" ) {
 					sOldMsgHeadLst[nOldMsgHeadIdx] = "";
 					continue;
 				}
-				
+
 				// 比較のため、ヘッダの名前を保持しておく
 				sOldHeadName = oMatchs[1];
-				
+
 				for ( nNewMsgHeadIdx = 0; nNewMsgHeadIdx < nNewMsgHeadCnt; nNewMsgHeadIdx++ ) {
 					// ヘッダでない場合、次へ
 					// 空行の場合もここではじかれる
 					if ( ! ( oMatchs = sNewMsgHeadLst[nNewMsgHeadIdx].match(/^([a-zA-Z0-9-]+?): *(.+)\n?$/) ) ) {
 						continue;
 					}
-					
+
 					// ヘッダの値がない場合、そのヘッダを無効にして次へ
 					if ( this.Trim(oMatchs[2]) == "" ) {
 						sNewMsgHeadLst[nNewMsgHeadIdx] = "";
 						continue;
 					}
-					
+
 					// 比較のため、ヘッダの名前を保持しておく
 					sNewHeadName = oMatchs[1];
-					
+
 					// 重複したヘッダの場合、新しいヘッダを使用する
 					// ただし、以後その新しいヘッダは無効にする
 					if ( sOldHeadName == sNewHeadName ) {
@@ -454,13 +454,13 @@ var Join = {
 						break;
 					}
 				}
-				
+
 				// 重複がない場合、旧いヘッダを使用する
 				if ( nNewMsgHeadIdx == nNewMsgHeadCnt ) {
 					sTbHead += ( this.DecodeCrlf(sOldMsgHeadLst[nOldMsgHeadIdx]) + "\n" );
 				}
 			}
-			
+
 			// 重複していない新しいヘッダをくっつける
 			for ( nNewMsgHeadIdx = 0; nNewMsgHeadIdx < nNewMsgHeadCnt; nNewMsgHeadIdx++ ) {
 				if ( sNewMsgHeadLst[nNewMsgHeadIdx] != "" ) {
@@ -468,24 +468,24 @@ var Join = {
 				}
 			}
 		}
-		
+
 		// add Thunderbird header to the message body
 		sMsgBody = sTbHead + "\n" + this.GetBody(sMsgBody) + "\n";
-		
+
 		var oMsgHead = oMsgLocalFolder.addMessage(sMsgBody);
 
 		// Mark new joined message as unread
 		oMsgHead.markRead(false);
-		
+
 		MyDump("------------------------------\n");
-		
+
 		MyDump("## It's done, Hooray!\n");
 		MyDump("==============================\n");
 
 		return 0;
 	},
-	
-	
+
+
 	//////////////////////////////////////////////////
 	///  Returns empty string on failure
 	//////////////////////////////////////////////////
@@ -494,31 +494,31 @@ var Join = {
 		// Conver new-line characters
 		sMsgData = sMsgData.replace(/\r\n/g, "\n");
 		sMsgData = sMsgData.replace(/\r/g, "\n");
-		
+
 		// Get location of first empty line
 		var nMsgSplitter = sMsgData.indexOf("\n\n");
-		
+
 		// Abort if no empty line
 		if ( nMsgSplitter == -1 ) {
 			return '';
 		}
-		
+
 		// Get string below this empty line
 		var sMsgBody = sMsgData.substr(nMsgSplitter + "\n\n".length);
-		
+
 		return sMsgBody;
 	},
-	
-	
+
+
 	FormHeader : function ( sMsgData )
 	{
 		// Conver new-line characters
 		sMsgData = sMsgData.replace(/\r\n/g, "\n");
 		sMsgData = sMsgData.replace(/\r/g, "\n");
-		
+
 		// Split data at each new-line
 		var sLineDataLst = sMsgData.split("\n");
-		
+
 		var sLineIdx = 0;
 		var sLineCnt = sLineDataLst.length;
 		var sMsgHead = '';
@@ -528,7 +528,7 @@ var Join = {
 			if ( sLineData == '' ) {
 				break;
 			}
-			
+
 			// don't add new-line at the first line
 			if ( sMsgHead != '' ) {
 				// if parameter one-line add new-line, if multi-line add <CRLF>
@@ -539,15 +539,15 @@ var Join = {
 					sMsgHead += '<CRLF>';
 				}
 			}
-			
+
 			sMsgHead += sLineData;
 		}
 		sMsgHead += "\n";
-		
+
 		return sMsgHead;
 	},
-	
-	
+
+
 	//////////////////////////////////////////////////
 	///  メッセージ URI からメッセージヘッダを取得する
 	///  (引数)
@@ -560,12 +560,12 @@ var Join = {
 		// おまじない
 		var oMsgStream = Components.classes["@mozilla.org/network/sync-stream-listener;1"].createInstance();
 		var oInStream = oMsgStream.QueryInterface(Components.interfaces.nsIInputStream);
-		
+
 		// おまじない
 		var oScrIn = Components.classes["@mozilla.org/scriptableinputstream;1"].createInstance();
 		var oScrInStream = oScrIn.QueryInterface(Components.interfaces.nsIScriptableInputStream);
 		oScrInStream.init(oInStream);
-		
+
 		// おまじない
 		var oMsgServ = messenger.messageServiceFromURI(sMsgUri);
 		try {
@@ -574,13 +574,13 @@ var Join = {
 		catch ( e ) {
 			return '';
 		}
-		
+
 		// メッセージデータを取得する
 		var sMsgHead = '';
 		oScrInStream.available();
 		while ( oScrInStream.available() ) {
 			sMsgHead += oScrInStream.read(1000);
-			
+
 			// 最初の空行までの文字列を返す
 			var nSpilitter = sMsgHead.indexOf("\r\n\r\n");
 			if ( nSpilitter != -1 ) {
@@ -588,21 +588,21 @@ var Join = {
 				break;
 			}
 		}
-		
+
 		return sMsgHead;
 	},
-	
+
 	GetMessage : function ( sMsgUri )
 	{
 		// おまじない
 		var oMsgStream = Components.classes["@mozilla.org/network/sync-stream-listener;1"].createInstance();
 		var oInStream = oMsgStream.QueryInterface(Components.interfaces.nsIInputStream);
-		
+
 		// おまじない
 		var oScrIn = Components.classes["@mozilla.org/scriptableinputstream;1"].createInstance();
 		var oScrInStream = oScrIn.QueryInterface(Components.interfaces.nsIScriptableInputStream);
 		oScrInStream.init(oInStream);
-		
+
 		// おまじない
 		var oMsgServ = messenger.messageServiceFromURI(sMsgUri);
 		try {
@@ -611,26 +611,26 @@ var Join = {
 		catch ( e ) {
 			return '';
 		}
-		
+
 		// メッセージデータを取得する
 		var sMsgData = '';
 		oScrInStream.available();
-		
+
 		while ( oScrInStream.available() ) {
 			sMsgData += oScrInStream.read(1000);
 		}
-		
+
 		return sMsgData;
 	},
-	
+
 	Trim : function ( sText )
 	{
 		return sText.match(/^\s*(.*?)\s*$/)[1];
 	},
-	
+
 	DecodeCrlf : function ( sText )
 	{
 		return sText.replace(/<CRLF>/g, "\n");
 	},
-	
+
 }

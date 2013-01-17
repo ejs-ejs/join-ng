@@ -66,13 +66,6 @@ var Join = {
 	//////////////////////////////////////////////////
 	SortPartMsgInfo : function ( oLeft, oRight )
 	{
-		if ( oLeft.id > oRight.id ) {
-			return 1;
-		}
-		else if ( oLeft.id < oRight.id ) {
-			return -1;
-		}
-
 		if ( Number(oLeft.number) > Number(oRight.number) ) {
 			return 1;
 		}

@@ -256,7 +256,7 @@ var Join = {
 		MyDump("## Check messages\n");
 
 		/*
-		 * First message must have "begin 666" and the last one "end"
+		 * First message must have "begin " and the last one "end"
 		 */
 		var sMsgData = this.GetMessage(oOldOEMsgInfoLst[0].uri);
 		var sMsgBody = this.GetBody(sMsgData);

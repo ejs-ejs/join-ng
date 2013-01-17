@@ -54,12 +54,6 @@ var Join = {
 		this.uri = uri;
 	},
 
-	OldOEMsgInfo : function ( subject, uri )
-	{
-		this.subject = subject;
-		this.uri = uri;
-	},
-
 	//////////////////////////////////////////////////
 	///  Sort by PartMsgInfo
 	///  Return 1 if needs sorting, else -1.
@@ -72,14 +66,6 @@ var Join = {
 		else {
 			return -1;
 		}
-	},
-
-	SortOldOEMsgInfo : function ( oLeft, oRight )
-	{
-		if ( oLeft.subject > oRight.subject )
-			return 1;
-
-		return -1;
 	},
 
 	Main : function ()
@@ -101,11 +87,62 @@ var Join = {
 		return 0;
 	},
 
+	MessagesBasicCheck : function (oMsgInfoLst, nMsgCnt)
+	{
+		MyDump("------------------------------\n");
+		MyDump("## Check messages\n");
+
+		// Check if we have all the messages
+		var nTotal = oMsgInfoLst[0].total;
+		if (nMsgCnt != nTotal) {
+			MyDump("The number of selected messages doesn't match the 'total' ... abort\n");
+			MyDump("==============================\n");
+
+			var sErrMsg = document.getElementById('JoinNGBundle').getString('UnmatchTotal');
+			var sErrDtl = "nMsgCnt=" + nMsgCnt + "\n" +
+			              "nTotal=" + nTotal;
+			alert(sErrMsg + "\n\n" + sErrDtl);
+			return false;
+		}
+
+		// Check if messages numbers are sequential
+		for (nMsgIdx = 0; nMsgIdx < nMsgCnt; nMsgIdx++) {
+			if (Number(oMsgInfoLst[nMsgIdx].number) != (nMsgIdx + 1)) {
+				MyDump("Message sequence No." + nMsgIdx + " does not match real No." + oMsgInfoLst[nMsgIdx].number + "\n");
+				MyDump("==============================\n");
+
+				var sErrMsg = document.getElementById('JoinNGBundle').getString('UnmatchMessageSeq');
+				alert(sErrMsg);
+				return false;
+			}
+		}
+
+		// Check if all messages have the same Message-ID
+		var sId = oMsgInfoLst[0].id;
+		MyDump("<List cnt=" + nMsgCnt + ">\n");
+		for ( nMsgIdx = 1; nMsgIdx < nMsgCnt; nMsgIdx++ ) {
+			if ( oMsgInfoLst[nMsgIdx].id != sId ) {
+				MyDump("Message No." + nMsgIdx + ": Invalid Message-ID ... abort\n");
+				MyDump("==============================\n");
+
+				var sErrMsg = document.getElementById('JoinNGBundle').getString('UnmatchMessageID');
+				var sErrDtl = "nMsgIdx=" + nMsgIdx + "\n" +
+				              "sId=" + sId + "\n" +
+				              "oMsgInfoLst[nMsgIdx].id=" + oMsgInfoLst[nMsgIdx].id;
+				alert(sErrMsg + "\n\n" + sErrDtl);
+				return false;
+			}
+
+			MyDump("Message No." + nMsgIdx + ": OK\n");
+		}
+
+		return true;
+	},
 
 	ProcessMIME : function (sMsgUriLst, nMsgCnt)
 	{
 		var oMsgInfoLst = new Array(nMsgCnt);
-		var nMsgIdx = 0;
+		var nMsgIdx;
 
 		// Get required info from all selected messages headers
 		MyDump("<List cnt=" + nMsgCnt + ">\n");
@@ -177,93 +214,73 @@ var Join = {
 
 		oMsgInfoLst.sort(this.SortPartMsgInfo);
 
+		var oMsgSortedUriLst = new Array(nMsgCnt);
 		MyDump("<List cnt=" + nMsgCnt + ">\n");
 		for ( nMsgIdx = 0; nMsgIdx < nMsgCnt; nMsgIdx++ ) {
 			MyDump("Message No." + nMsgIdx + ": " +
 			       "number=" + oMsgInfoLst[nMsgIdx].number + ", " +
 			       "total=" + oMsgInfoLst[nMsgIdx].total + ", " +
 			       "id=" + oMsgInfoLst[nMsgIdx].id + "\n");
-		}
-
-		MyDump("------------------------------\n");
-		MyDump("## Check messages\n");
-
-		// Check if we have all the messages
-		var nTotal = oMsgInfoLst[0].total;
-		if ( nMsgCnt != nTotal ) {
-			MyDump("The number of selected messages doesn't match the 'total' of the parameter for 'message/partial' ... abort\n");
-			MyDump("==============================\n");
-
-			var sErrMsg = document.getElementById('JoinNGBundle').getString('UnmatchTotal');
-			var sErrDtl = "nMsgCnt=" + nMsgCnt + "\n" +
-			              "nTotal=" + nTotal;
-			alert(sErrMsg + "\n\n" + sErrDtl);
-			return null;
-		}
-
-		// Check if all messages have the same Message-ID
-		// while checking also build new sorted UriLst
-		var sId = oMsgInfoLst[0].id;
-		var oMsgSortedUriLst = new Array(nMsgCnt);
-		MyDump("<List cnt=" + nMsgCnt + ">\n");
-		for ( nMsgIdx = 0; nMsgIdx < nMsgCnt; nMsgIdx++ ) {
-			if ( oMsgInfoLst[nMsgIdx].id != sId ) {
-				MyDump("Message No." + nMsgIdx + ": Invalid Message-ID ... abort\n");
-				MyDump("==============================\n");
-
-				var sErrMsg = document.getElementById('JoinNGBundle').getString('UnmatchMessageID');
-				var sErrDtl = "nMsgIdx=" + nMsgIdx + "\n" +
-				              "sId=" + sId + "\n" +
-				              "oMsgInfoLst[nMsgIdx].id=" + oMsgInfoLst[nMsgIdx].id;
-				alert(sErrMsg + "\n\n" + sErrDtl);
-				return null;
-			}
-
 			oMsgSortedUriLst[nMsgIdx] = oMsgInfoLst[nMsgIdx].uri;
-			MyDump("Message No." + nMsgIdx + ": OK\n");
 		}
+
+		if (!this.MessagesBasicCheck(oMsgInfoLst, nMsgCnt))
+			return null;
+
 		return oMsgSortedUriLst;
 	},
 
 	ProcessOldOE : function (sMsgUriLst, nMsgCnt)
 	{
-		var oOldOEMsgInfoLst = new Array(nMsgCnt);
+		var oMsgInfoLst = new Array(nMsgCnt);
+		var nMsgIdx;
 
 		// Get required info from all selected messages headers
 		MyDump("<List cnt=" + nMsgCnt + ">\n");
 		for ( nMsgIdx = 0; nMsgIdx < nMsgCnt; nMsgIdx++ ) {
 			var msgUri = sMsgUriLst[nMsgIdx];
 			var msgHdr = messenger.msgHdrFromURI(msgUri);
-			oOldOEMsgInfoLst[nMsgIdx] = new this.OldOEMsgInfo();
+			oMsgInfoLst[nMsgIdx] = new this.PartMsgInfo();
 
-			oOldOEMsgInfoLst[nMsgIdx].uri = msgUri;
-			oOldOEMsgInfoLst[nMsgIdx].subject = msgHdr.subject;
+			oMsgInfoLst[nMsgIdx].uri = msgUri;
+
+			try {
+				var msgNumbers = msgHdr.subject.match(/(.*)\[(\d*)\/(\d*)\]$/);
+				oMsgInfoLst[nMsgIdx].id = msgNumbers[1];
+				oMsgInfoLst[nMsgIdx].number = msgNumbers[2];
+				oMsgInfoLst[nMsgIdx].total = msgNumbers[3];
+			}
+			catch (e) {
+				return null;
+			}
 		}
 
 		MyDump("------------------------------\n");
 		MyDump("## Sort messages\n");
 
-		oOldOEMsgInfoLst.sort(this.SortOldOEMsgInfo);
+		oMsgInfoLst.sort(this.SortPartMsgInfo);
 
 		var oMsgSortedUriLst = new Array(nMsgCnt);
 		MyDump("<List cnt=" + nMsgCnt + ">\n");
 		for ( nMsgIdx = 0; nMsgIdx < nMsgCnt; nMsgIdx++ ) {
-			MyDump("Message subject:" + oOldOEMsgInfoLst[nMsgIdx].subject + "\n");
-			oMsgSortedUriLst[nMsgIdx] = oOldOEMsgInfoLst[nMsgIdx].uri;
+			MyDump("Message No." + nMsgIdx + ": " +
+			       "number=" + oMsgInfoLst[nMsgIdx].number + ", " +
+			       "total=" + oMsgInfoLst[nMsgIdx].total + "\n");
+			oMsgSortedUriLst[nMsgIdx] = oMsgInfoLst[nMsgIdx].uri;
 		}
 
-		MyDump("------------------------------\n");
-		MyDump("## Check messages\n");
+		if (!this.MessagesBasicCheck(oMsgInfoLst, nMsgCnt))
+			return null;
 
 		/*
 		 * First message must have "begin " and the last one "end"
 		 */
-		var sMsgData = this.GetMessage(oOldOEMsgInfoLst[0].uri);
+		var sMsgData = this.GetMessage(oMsgInfoLst[0].uri);
 		var sMsgBody = this.GetBody(sMsgData);
 		if (sMsgBody.indexOf("begin ") == -1)
 			return null;
 
-		sMsgData = this.GetMessage(oOldOEMsgInfoLst[nMsgCnt - 1].uri);
+		sMsgData = this.GetMessage(oMsgInfoLst[nMsgCnt - 1].uri);
 		sMsgBody = this.GetBody(sMsgData);
 		if (sMsgBody.indexOf("end") == -1)
 			return null;

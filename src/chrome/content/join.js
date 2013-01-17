@@ -211,7 +211,6 @@ var Join = {
 				MyDump("Message No." + nMsgIdx + ": Invalid Message-ID ... abort\n");
 				MyDump("==============================\n");
 
-				// エラーメッセージを表示して中断する
 				var sErrMsg = document.getElementById('JoinNGBundle').getString('UnmatchMessageID');
 				var sErrDtl = "nMsgIdx=" + nMsgIdx + "\n" +
 				              "sId=" + sId + "\n" +
@@ -261,7 +260,7 @@ var Join = {
 		 */
 		var sMsgData = this.GetMessage(oOldOEMsgInfoLst[0].uri);
 		var sMsgBody = this.GetBody(sMsgData);
-		if (sMsgBody.indexOf("begin 666") == -1)
+		if (sMsgBody.indexOf("begin ") == -1)
 			return null;
 
 		sMsgData = this.GetMessage(oOldOEMsgInfoLst[nMsgCnt - 1].uri);

@@ -245,7 +245,7 @@ var Join = {
 			oMsgInfoLst[nMsgIdx].uri = msgUri;
 
 			try {
-				var msgNumbers = msgHdr.subject.match(/(.*)\[(\d*)\/(\d*)\]$/);
+				var msgNumbers = msgHdr.subject.match(/(.*)\[(\d+)\/(\d+)\]$/);
 				oMsgInfoLst[nMsgIdx].id = msgNumbers[1];
 				oMsgInfoLst[nMsgIdx].number = msgNumbers[2];
 				oMsgInfoLst[nMsgIdx].total = msgNumbers[3];
@@ -273,16 +273,16 @@ var Join = {
 			return null;
 
 		/*
-		 * First message must have "begin " and the last one "end"
+		 * First message must have "begin" and the last one "end"
 		 */
 		var sMsgData = this.GetMessage(oMsgInfoLst[0].uri);
 		var sMsgBody = this.GetBody(sMsgData);
-		if (sMsgBody.indexOf("begin ") == -1)
+		if (sMsgBody.match(/^begin \d\d\d /) == -1)
 			return null;
 
 		sMsgData = this.GetMessage(oMsgInfoLst[nMsgCnt - 1].uri);
 		sMsgBody = this.GetBody(sMsgData);
-		if (sMsgBody.indexOf("end") == -1)
+		if (sMsgBody.match(/^end$/) == -1)
 			return null;
 
 		return oMsgSortedUriLst;

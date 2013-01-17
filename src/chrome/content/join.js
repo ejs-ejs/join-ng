@@ -349,14 +349,17 @@ var Join = {
 		
 		MyDump("<List cnt=" + nMsgCnt + ">\n");
 		for ( nMsgIdx = 0; nMsgIdx < nMsgCnt; nMsgIdx++ ) {
-			
 			// Get the message URI
 			var sMsgUri = sMsgSortedUriLst[nMsgIdx];
-			
+			var msgHdr = messenger.msgHdrFromURI(sMsgUri);
+
 			// Get message body by URI
 			var sMsgData = this.GetMessage(sMsgUri);
 			sMsgBody += this.GetBody(sMsgData);
-			
+
+			// Mark joined messages as read
+			msgHdr.markRead(true);
+
 			MyDump("Message No." + nMsgIdx + ": done\n");
 		}
 		

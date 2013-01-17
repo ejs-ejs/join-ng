@@ -265,7 +265,8 @@ var Join = {
 		for ( nMsgIdx = 0; nMsgIdx < nMsgCnt; nMsgIdx++ ) {
 			MyDump("Message No." + nMsgIdx + ": " +
 			       "number=" + oMsgInfoLst[nMsgIdx].number + ", " +
-			       "total=" + oMsgInfoLst[nMsgIdx].total + "\n");
+			       "total=" + oMsgInfoLst[nMsgIdx].total + ", " +
+			       "id=" + oMsgInfoLst[nMsgIdx].id + "\n");
 			oMsgSortedUriLst[nMsgIdx] = oMsgInfoLst[nMsgIdx].uri;
 		}
 

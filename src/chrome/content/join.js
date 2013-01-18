@@ -501,12 +501,8 @@ var Join = {
 	//////////////////////////////////////////////////
 	GetBody : function ( sMsgData )
 	{
-		// Conver new-line characters
-		sMsgData = sMsgData.replace(/\r\n/g, "\n");
-		sMsgData = sMsgData.replace(/\r/g, "\n");
-
 		// Get location of first empty line
-		var nMsgSplitter = sMsgData.indexOf("\n\n");
+		var nMsgSplitter = sMsgData.search(/\r?\n\r?\n/);
 
 		// Abort if no empty line
 		if ( nMsgSplitter == -1 ) {
@@ -522,12 +518,8 @@ var Join = {
 
 	FormHeader : function ( sMsgData )
 	{
-		// Conver new-line characters
-		sMsgData = sMsgData.replace(/\r\n/g, "\n");
-		sMsgData = sMsgData.replace(/\r/g, "\n");
-
 		// Split data at each new-line
-		var sLineDataLst = sMsgData.split("\n");
+		var sLineDataLst = sMsgData.split(/\r?\n/);
 
 		var sLineIdx = 0;
 		var sLineCnt = sLineDataLst.length;
@@ -592,7 +584,7 @@ var Join = {
 			sMsgHead += oScrInStream.read(1000);
 
 			// 最初の空行までの文字列を返す
-			var nSpilitter = sMsgHead.indexOf("\r\n\r\n");
+			var nSpilitter = sMsgHead.search(/\r?\n\r?\n/);
 			if ( nSpilitter != -1 ) {
 				sMsgHead = sMsgHead.substr(0, nSpilitter);
 				break;

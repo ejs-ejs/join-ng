@@ -365,7 +365,7 @@ var Join = {
 
 			// Get message body by URI
 			var sMsgData = this.GetMessage(sMsgUri);
-			sMsgBody += this.GetBody(sMsgData);
+			sMsgBody += this.GetBody(sMsgData) + "\n";
 
 			// Mark joined messages as read
 			msgHdr.markRead(true);
@@ -510,9 +510,9 @@ var Join = {
 		}
 
 		// Get string below this empty line
-		var sMsgBody = sMsgData.substr(nMsgSplitter + "\n\n".length);
+		var sMsgBody = sMsgData.substr(nMsgSplitter);
 
-		return sMsgBody;
+		return sMsgBody.trim();
 	},
 
 

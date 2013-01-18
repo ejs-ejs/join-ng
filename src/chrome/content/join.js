@@ -480,7 +480,7 @@ var Join = {
 		}
 
 		// add Thunderbird header to the message body
-		sMsgBody = sTbHead + "\n" + this.GetBody(sMsgBody) + "\n";
+		sMsgBody = sTbHead + "\n" + sMsgBody + "\n";
 
 		var oMsgHead = oMsgLocalFolder.addMessage(sMsgBody);
 

@@ -432,7 +432,7 @@ var Join = {
 				}
 
 				// ヘッダの値がない場合、そのヘッダを無効にして次へ
-				if ( this.Trim(oMatchs[2]) == "" ) {
+				if ( oMatchs[2].trim() == "" ) {
 					sOldMsgHeadLst[nOldMsgHeadIdx] = "";
 					continue;
 				}
@@ -448,7 +448,7 @@ var Join = {
 					}
 
 					// ヘッダの値がない場合、そのヘッダを無効にして次へ
-					if ( this.Trim(oMatchs[2]) == "" ) {
+					if ( oMatchs[2].trim() == "" ) {
 						sNewMsgHeadLst[nNewMsgHeadIdx] = "";
 						continue;
 					}
@@ -625,14 +625,8 @@ var Join = {
 		return sMsgData;
 	},
 
-	Trim : function ( sText )
-	{
-		return sText.match(/^\s*(.*?)\s*$/)[1];
-	},
-
 	DecodeCrlf : function ( sText )
 	{
 		return sText.replace(/<CRLF>/g, "\n");
 	},
-
 }

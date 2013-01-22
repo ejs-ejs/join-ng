@@ -94,7 +94,7 @@ var Join = {
 		MyDump("## Check messages\n");
 
 		// Check if we have all the messages
-		var nTotal = oMsgInfoLst[0].total;
+		var nTotal = oMsgInfoLst[nMsgCnt - 1].total;
 		if (nMsgCnt != nTotal) {
 			MyDump("The number of selected messages doesn't match the 'total' ... abort\n");
 			MyDump("==============================\n");
@@ -182,15 +182,21 @@ var Join = {
 			oMsgInfoLst[nMsgIdx] = new this.PartMsgInfo();
 			try {
 				oMsgInfoLst[nMsgIdx].number = sMsgType.match(/number=([0-9]+)/i)[1];
-				oMsgInfoLst[nMsgIdx].total = sMsgType.match(/total=([0-9]+)/i)[1];
+
+				// total is optional parameter in not last messages
+				// MessagesBasicCheck() will check if it was correct in last message.
+				var oTotRes = sMsgType.match(/total=([0-9]+)/i);
+				if (oTotRes[0])
+					oMsgInfoLst[nMsgIdx].total = oTotRes[1];
+				else
+					oMsgInfoLst[nMsgIdx].total = 0;
 
 				var oREResLst = sMsgType.match(/id=\"([^\"]+)\"|id=([^ \(\)<>@,;:\\\"\/\[\]\?=]+)(\(null\))?[;$]/i);
-				if ( oREResLst[1] ) {
+				if (oREResLst[1])
 					oMsgInfoLst[nMsgIdx].id = oREResLst[1];
-				}
-				else {
+				else
 					oMsgInfoLst[nMsgIdx].id = oREResLst[2];
-				}
+
 				oMsgInfoLst[nMsgIdx].uri = sMsgUri;
 			}
 			catch ( e ) {

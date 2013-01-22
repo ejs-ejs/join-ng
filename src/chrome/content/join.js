@@ -45,6 +45,7 @@ function MyDump( sMsg )
 var Join = {
 
 	mStatusFeedback: null,
+	mIsMIME: false,
 
 	PartMsgInfo : function ( number, total, id, uri )
 	{
@@ -106,6 +107,7 @@ var Join = {
 		}
 
 		// Check if messages numbers are sequential
+		var nMsgIdx;
 		for (nMsgIdx = 0; nMsgIdx < nMsgCnt; nMsgIdx++) {
 			if (Number(oMsgInfoLst[nMsgIdx].number) != (nMsgIdx + 1)) {
 				MyDump("Message sequence No." + nMsgIdx + " does not match real No." + oMsgInfoLst[nMsgIdx].number + "\n");
@@ -227,7 +229,44 @@ var Join = {
 		if (!this.MessagesBasicCheck(oMsgInfoLst, nMsgCnt))
 			return null;
 
+		this.mIsMIME = true;
+
 		return oMsgSortedUriLst;
+	},
+
+	/**
+	 * http://www.freesoft.org/CIE/RFC/1521/24.htm
+	 */
+	GenerateMIMEHeader : function (sFirstMsgUri)
+	{
+		// Get old message header from the first message
+		// Each line is split into sOrigMsgHeadLst list
+		var sMsgData = this.GetHeader(sFirstMsgUri);
+		var sMsgHead = this.FormHeader(sMsgData);
+		var sOrigMsgHeadLst = sMsgHead.split("\n");
+
+		// Get the encapslated message header of the first message
+		// Each element of sEncMsgHeadLst is divided into array
+		var sMsgBody = this.GetBody(this.GetMessage(sFirstMsgUri));
+		var sEncMsgHead = this.FormHeader(sMsgBody);
+		var sEncMsgHeadLst = sEncMsgHead.split("\n");
+
+		// Merge headers
+		var sTbHead = '';
+		var nMsgHeadIdx;
+		var sSpecialHeaders = /^Content-|^Message-ID|^Encrypted|^MIME-Version/i;
+
+		// copy everything except special headers
+		for (nMsgHeadIdx = 0; nMsgHeadIdx < sOrigMsgHeadLst.length; nMsgHeadIdx++)
+			if (!sSpecialHeaders.test(sOrigMsgHeadLst[nMsgHeadIdx]))
+				sTbHead += this.DecodeCrlf(sOrigMsgHeadLst[nMsgHeadIdx]) + "\n";
+
+		// append special headers from enclosed header
+		for (nMsgHeadIdx = 0; nMsgHeadIdx < sEncMsgHeadLst.length; nMsgHeadIdx++)
+			if (sSpecialHeaders.test(sEncMsgHeadLst[nMsgHeadIdx])) 
+				sTbHead += this.DecodeCrlf(sEncMsgHeadLst[nMsgHeadIdx]) + "\n";
+
+		return sTbHead;
 	},
 
 	ProcessOldOE : function (sMsgUriLst, nMsgCnt)
@@ -286,7 +325,45 @@ var Join = {
 		if (sMsgBody.match(/^end$/) == -1)
 			return null;
 
+		this.mIsMIME = false;
+
 		return oMsgSortedUriLst;
+	},
+
+	GenerateOldOEHeader : function (sFirstMsgUri)
+	{
+		return this.GetHeader(sFirstMsgUri);
+	},
+
+	GenerateHeader : function (sFirstMsgUri, oMsgFolder)
+	{
+		var sTbHead;
+
+		if (this.mIsMIME)
+			sTbHead = this.GenerateMIMEHeader(sFirstMsgUri);
+		else
+			sTbHead = this.GenerateOldOEHeader(sFirstMsgUri);
+
+		// X-Account-Key
+		if (sTbHead.indexOf("X-Account-Key") < 0) {
+			let oAccountMng = Components.classes["@mozilla.org/messenger/account-manager;1"].getService()
+			                  .QueryInterface(Components.interfaces.nsIMsgAccountManager);
+			let oAccount = oAccountMng.FindAccountForServer(oMsgFolder.server);
+			sTbHead = "X-Account-Key: " + oAccount.key + "\n" + sTbHead;
+		}
+
+		// X-Mozilla-Status and X-Mozilla-Status2
+		if (sTbHead.indexOf("X-Mozilla-Status") < 0) {
+			sTbHead = "X-Mozilla-Status: 0000\n" +
+			          "X-Mozilla-Status2: 00000000\n" +
+				  sTbHead;
+		}
+
+		// From
+		var oNow = new Date;
+		sTbHead = "From - " + oNow.toString() + "\n" + sTbHead;
+
+		return sTbHead;
 	},
 
 	GetLocalFolder : function ()
@@ -365,6 +442,9 @@ var Join = {
 
 			// Get message body by URI
 			var sMsgData = this.GetMessage(sMsgUri);
+			// First MIME message has encapsulated header. Remove it.
+			if (this.mIsMIME && nMsgIdx == 0)
+				sMsgData = this.GetBody(sMsgData);
 			sMsgBody += this.GetBody(sMsgData) + "\n";
 
 			// Mark joined messages as read
@@ -381,106 +461,10 @@ var Join = {
 		var oMsgLocalFolder = oMsgFolder.QueryInterface(Components.interfaces.nsIMsgLocalMailFolder);
 
 		// Thunderbird message header
-		var sTbHead = '';
-		// From
-		var oNow = new Date;
-		sTbHead += "From - " + oNow.toString() + "\n";
-		// X-Mozilla-Status and X-Mozilla-Status2
-		if ( sMsgBody.indexOf("X-Mozilla-Status") < 0 ) {
-			sTbHead += "X-Mozilla-Status: 0001\n" +
-			           "X-Mozilla-Status2: 00000000\n";
-		}
-		// X-Account-Key
-		if ( sMsgBody.indexOf("X-Account-Key") < 0) {
-			var oAccountMng = Components.classes["@mozilla.org/messenger/account-manager;1"].getService()
-			                  .QueryInterface(Components.interfaces.nsIMsgAccountManager);
-			var oAccount = oAccountMng.FindAccountForServer(oMsgFolder.server);
-			sTbHead += "X-Account-Key: " + oAccount.key + "\n";
-		}
-
-		// Fill new message header from original messages if enabled
-		if ( Services.prefs.getBoolPref("extensions.join-ng.fill") == true ) {
-			// Get old message header from the first message
-			// Each line is split into sOldMsgHeadLst list
-			var sMsgData = this.GetHeader(sMsgSortedUriLst[0]);
-			var sMsgHead = this.FormHeader(sMsgData);
-			var sOldMsgHead = sMsgHead.replace(/\r\n/g, "\n");
-			sOldMsgHead = sOldMsgHead.replace(/\r/g, "\n");
-			var sOldMsgHeadLst = sOldMsgHead.split("\n");
-			var nOldMsgHeadCnt = sOldMsgHeadLst.length;
-
-			// 新しい (結合後の) メッセージのメッセージヘッダを取得する
-			// このメッセージヘッダは FormHeader() によって <CRLF> が挿入されている
-			// sNewMsgHeadLst の各要素はヘッダごとに分割されている
-			var sNewMsgHead = this.FormHeader(sMsgBody);
-			sNewMsgHead = sNewMsgHead.replace(/\r\n/g, "\n");
-			sNewMsgHead = sNewMsgHead.replace(/\r/g, "\n");
-			var sNewMsgHeadLst = sNewMsgHead.split("\n");
-			var nNewMsgHeadCnt = sNewMsgHeadLst.length;
-
-			// メッセージヘッダをマージする
-			var nOldMsgHeadIdx = 0;
-			var nNewMsgHeadIdx = 0;
-			var oMatchs = 0;
-			var sOldHeadName = '';
-			var sNewHeadName = '';
-			for ( nOldMsgHeadIdx = 0; nOldMsgHeadIdx < nOldMsgHeadCnt; nOldMsgHeadIdx++ ) {
-				// ヘッダでない場合、次へ
-				// 空行の場合もここではじかれる
-				if ( ! ( oMatchs = sOldMsgHeadLst[nOldMsgHeadIdx].match(/^([a-zA-Z0-9-]+?): *(.+)\n?$/) ) ) {
-					continue;
-				}
-
-				// ヘッダの値がない場合、そのヘッダを無効にして次へ
-				if ( oMatchs[2].trim() == "" ) {
-					sOldMsgHeadLst[nOldMsgHeadIdx] = "";
-					continue;
-				}
-
-				// 比較のため、ヘッダの名前を保持しておく
-				sOldHeadName = oMatchs[1];
-
-				for ( nNewMsgHeadIdx = 0; nNewMsgHeadIdx < nNewMsgHeadCnt; nNewMsgHeadIdx++ ) {
-					// ヘッダでない場合、次へ
-					// 空行の場合もここではじかれる
-					if ( ! ( oMatchs = sNewMsgHeadLst[nNewMsgHeadIdx].match(/^([a-zA-Z0-9-]+?): *(.+)\n?$/) ) ) {
-						continue;
-					}
-
-					// ヘッダの値がない場合、そのヘッダを無効にして次へ
-					if ( oMatchs[2].trim() == "" ) {
-						sNewMsgHeadLst[nNewMsgHeadIdx] = "";
-						continue;
-					}
-
-					// 比較のため、ヘッダの名前を保持しておく
-					sNewHeadName = oMatchs[1];
-
-					// 重複したヘッダの場合、新しいヘッダを使用する
-					// ただし、以後その新しいヘッダは無効にする
-					if ( sOldHeadName == sNewHeadName ) {
-						sTbHead += ( this.DecodeCrlf(sNewMsgHeadLst[nNewMsgHeadIdx]) + "\n" );
-						sNewMsgHeadLst[nNewMsgHeadIdx] = "";
-						break;
-					}
-				}
-
-				// 重複がない場合、旧いヘッダを使用する
-				if ( nNewMsgHeadIdx == nNewMsgHeadCnt ) {
-					sTbHead += ( this.DecodeCrlf(sOldMsgHeadLst[nOldMsgHeadIdx]) + "\n" );
-				}
-			}
-
-			// 重複していない新しいヘッダをくっつける
-			for ( nNewMsgHeadIdx = 0; nNewMsgHeadIdx < nNewMsgHeadCnt; nNewMsgHeadIdx++ ) {
-				if ( sNewMsgHeadLst[nNewMsgHeadIdx] != "" ) {
-					sTbHead += ( this.DecodeCrlf(sNewMsgHeadLst[nNewMsgHeadIdx]) + "\n" );
-				}
-			}
-		}
+		var sTbHead = this.GenerateHeader(sMsgSortedUriLst[0], oMsgFolder);
 
 		// add Thunderbird header to the message body
-		sMsgBody = sTbHead + "\n" + sMsgBody + "\n";
+		sMsgBody = sTbHead + "\n\n" + sMsgBody + "\n";
 
 		var oMsgHead = oMsgLocalFolder.addMessage(sMsgBody);
 
@@ -544,7 +528,6 @@ var Join = {
 
 			sMsgHead += sLineData;
 		}
-		sMsgHead += "\n";
 
 		return sMsgHead;
 	},

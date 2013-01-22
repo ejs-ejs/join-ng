@@ -366,8 +366,10 @@ var Join = {
 		}
 
 		// From
-		var oNow = new Date;
-		sTbHead = "From - " + oNow.toString() + "\n" + sTbHead;
+		if (sTbHead.indexOf("From - ") < 0) {
+			let oNow = new Date;
+			sTbHead = "From - " + oNow.toString() + "\n" + sTbHead;
+		}
 
 		return sTbHead;
 	},

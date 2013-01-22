@@ -350,6 +350,9 @@ var Join = {
 		else
 			sTbHead = this.GenerateOldOEHeader(sFirstMsgUri);
 
+		// Try to improve subject by removing [1/99] ant the end of it
+		sTbHead = sTbHead.replace(/(^Subject: .*)\s*\[\d+\/\d+\]$/m, "$1");
+
 		// X-Account-Key
 		if (sTbHead.indexOf("X-Account-Key") < 0) {
 			let oAccountMng = Components.classes["@mozilla.org/messenger/account-manager;1"].getService()
@@ -443,6 +446,7 @@ var Join = {
 		var sMsgBody = '';
 
 		MyDump("<List cnt=" + nMsgCnt + ">\n");
+		var nMsgIdx;
 		for ( nMsgIdx = 0; nMsgIdx < nMsgCnt; nMsgIdx++ ) {
 			// Get the message URI
 			var sMsgUri = sMsgSortedUriLst[nMsgIdx];

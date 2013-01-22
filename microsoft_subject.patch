@@ -1,0 +1,26 @@
+diff --git a/src/chrome/content/join.js b/src/chrome/content/join.js
+index 98a8e1a..46d524c 100644
+--- a/src/chrome/content/join.js
++++ b/src/chrome/content/join.js
+@@ -257,10 +257,20 @@ var Join = {
+ 		var sEncMsgHead = this.FormHeader(sMsgBody);
+ 		var sEncMsgHeadLst = sEncMsgHead.split("\n");
+ 
++		var sSpecialHeaders;
++		/**
++		 * Microsoft clients put "better" Subject to enclosed header.
++		 * Detect if that is the case and extract ir from there.
++		 */
++		if ((sEncMsgHead.indexOf("Microsoft") > -1) &&
++		    (sEncMsgHead.indexOf("Subject") > -1))
++			sSpecialHeaders = /^Content-|^Message-ID|^Encrypted|^MIME-Version|^Subject/i;
++		else
++			sSpecialHeaders = /^Content-|^Message-ID|^Encrypted|^MIME-Version/i;
++
+ 		// Merge headers
+ 		var sTbHead = '';
+ 		var nMsgHeadIdx;
+-		var sSpecialHeaders = /^Content-|^Message-ID|^Encrypted|^MIME-Version/i;
+ 
+ 		// copy everything except special headers
+ 		for (nMsgHeadIdx = 0; nMsgHeadIdx < sOrigMsgHeadLst.length; nMsgHeadIdx++)

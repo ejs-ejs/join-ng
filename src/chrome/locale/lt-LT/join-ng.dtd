@@ -1,6 +1,4 @@
 <!-- Labels -->
 <!ENTITY join-ng.label "Apjungti">
 <!ENTITY JoinNGOptionTitle "Apjungimo nuostatos">
-<!ENTITY JoinNGGenerateOptionLabel "Žinučių apjungimas">
-<!ENTITY JoinNGFillLabel "Naudoti originalios žinutės tarnybinę informaciją">
 <!ENTITY JoinNGFolderLabel "Apjungtų žinučių aplanko pavadinimas">

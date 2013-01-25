@@ -27,6 +27,9 @@
 ///
 //////////////////////////////////////////////////
 
+const nsIAP = Components.interfaces.nsIActivityProcess;
+const nsIAE = Components.interfaces.nsIActivityEvent;
+const nsIAM = Components.interfaces.nsIActivityManager;
 
 //////////////////////////////////////////////////
 ///  Displays debug info on console.
@@ -43,8 +46,6 @@ function MyDump( sMsg )
 
 
 var Join = {
-
-	mStatusFeedback: null,
 	mIsMIME: false,
 
 	PartMsgInfo : function ( number, total, id, uri )
@@ -72,17 +73,10 @@ var Join = {
 	Main : function ()
 	{
 		try {
-			window.setCursor('wait');
-			this.mStatusFeedback = msgWindow.statusFeedback;
-			this.mStatusFeedback.startMeteors();
 			this.Join();
 		}
 		catch ( e ) {
 			MyDump("!!!! Exception: " + e + "\n");
-		}
-		finally {
-			this.mStatusFeedback.stopMeteors();
-			window.setCursor('auto');
 		}
 
 		return 0;
@@ -403,10 +397,19 @@ var Join = {
 	//////////////////////////////////////////////////
 	Join : function ()
 	{
+		let gActivityManager = Components.classes["@mozilla.org/activity-manager;1"].getService(nsIAM);
+		let joinProcess = Components.classes["@mozilla.org/activity-process;1"].createInstance(nsIAP);
+
 		MyDump("==============================\n");
 		MyDump("## Start join process\n");
 
-		this.mStatusFeedback.showStatusString(document.getElementById('JoinNGBundle').getString('JoinInProgress'));
+		joinProcess.init(document.getElementById('JoinNGBundle').getString('JoinInProgress'), null);
+		joinProcess.contextType = "account";     // group this activity by account
+		joinProcess.contextObj = gFolderDisplay.displayedFolder.server;  // account in question
+
+		gActivityManager.addActivity(joinProcess);
+
+		joinProcess.setProgress(document.getElementById('JoinNGBundle').getString('JoinInProgress'), 0, 0);
 
 		MyDump("------------------------------\n");
 		MyDump("## Get selected messages\n");
@@ -484,9 +487,26 @@ var Join = {
 		oMsgHead.markRead(false);
 
 		MyDump("------------------------------\n");
-
 		MyDump("## It's done, Hooray!\n");
 		MyDump("==============================\n");
+
+		joinProcess.state = Components.interfaces.nsIActivityProcess.STATE_COMPLETED;
+		gActivityManager.removeActivity(joinProcess.id);
+
+		var joinEvent = Components.classes["@mozilla.org/activity-event;1"].createInstance(nsIAE);
+		var sSubject = sTbHead.match(/^Subject: (.*)/m)[1];
+ 
+		// Localization is omitted, initiator is omitted
+		joinEvent.init(document.getElementById('JoinNGBundle').getString('JoinedMessage') + " " + sSubject,
+			       null,
+			       null,
+			       joinProcess.startTime,  // start time
+			       Date.now());        // completion time
+ 
+		joinEvent.contextType = joinProcess.contextType; // optional
+		joinEvent.contextObj = joinProcess.contextObj;   // optional
+              
+		gActivityManager.addActivity(joinEvent);
 
 		return 0;
 	},

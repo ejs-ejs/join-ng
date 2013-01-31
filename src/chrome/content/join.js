@@ -96,8 +96,7 @@ var Join = {
 			var sErrMsg = document.getElementById('JoinNGBundle').getString('UnmatchTotal');
 			var sErrDtl = "nMsgCnt=" + nMsgCnt + "\n" +
 			              "nTotal=" + nTotal;
-			alert(sErrMsg + "\n\n" + sErrDtl);
-			return false;
+			throw sErrMsg + "\n\n" + sErrDtl;
 		}
 
 		// Check if messages numbers are sequential
@@ -108,8 +107,7 @@ var Join = {
 				MyDump("==============================\n");
 
 				var sErrMsg = document.getElementById('JoinNGBundle').getString('UnmatchMessageSeq');
-				alert(sErrMsg);
-				return false;
+				throw sErrMsg;
 			}
 		}
 
@@ -125,14 +123,11 @@ var Join = {
 				var sErrDtl = "nMsgIdx=" + nMsgIdx + "\n" +
 				              "sId=" + sId + "\n" +
 				              "oMsgInfoLst[nMsgIdx].id=" + oMsgInfoLst[nMsgIdx].id;
-				alert(sErrMsg + "\n\n" + sErrDtl);
-				return false;
+				throw sErrMsg + "\n\n" + sErrDtl;
 			}
 
 			MyDump("Message No." + nMsgIdx + ": OK\n");
 		}
-
-		return true;
 	},
 
 	ProcessMIME : function (sMsgUriLst, nMsgCnt)
@@ -167,8 +162,7 @@ var Join = {
 				var sErrMsg = document.getElementById('JoinNGBundle').getString('NotPartialMessage');
 				var sErrDtl = "nMsgIdx=" + nMsgIdx + "\n" +
 				              "sMsgType=" + sMsgType;
-				alert(sErrMsg + "\n\n" + sErrDtl);
-				return null;
+				throw sErrMsg + "\n\n" + sErrDtl;
 			}
 
 			// Get message/partial fields info (case insensitive)
@@ -200,8 +194,7 @@ var Join = {
 				var sErrMsg = document.getElementById('JoinNGBundle').getString('MissingParameter');
 				var sErrDtl = "nMsgIdx=" + nMsgIdx + "\n" +
 				              "sMsgType=" + sMsgType;
-				alert(sErrMsg + "\n\n" + e + "\n" + sErrDtl);
-				return null;
+				throw sErrMsg + "\n\n" + e + "\n" + sErrDtl;
 			}
 
 			MyDump("Message No." + nMsgIdx + ": " +
@@ -226,8 +219,7 @@ var Join = {
 			oMsgSortedUriLst[nMsgIdx] = oMsgInfoLst[nMsgIdx].uri;
 		}
 
-		if (!this.MessagesBasicCheck(oMsgInfoLst, nMsgCnt))
-			return null;
+		this.MessagesBasicCheck(oMsgInfoLst, nMsgCnt);
 
 		this.mIsMIME = true;
 
@@ -309,8 +301,7 @@ var Join = {
 			oMsgSortedUriLst[nMsgIdx] = oMsgInfoLst[nMsgIdx].uri;
 		}
 
-		if (!this.MessagesBasicCheck(oMsgInfoLst, nMsgCnt))
-			return null;
+		this.MessagesBasicCheck(oMsgInfoLst, nMsgCnt);
 
 		/*
 		 * First message must have "begin" and the last one "end"
@@ -432,15 +423,21 @@ var Join = {
 
 		var nMsgCnt = sMsgUriLst.length;
 
-		var sMsgSortedUriLst = this.ProcessMIME(sMsgUriLst, nMsgCnt);
-		if (sMsgSortedUriLst == null) {
-			// Maybe this message is from old OE and has no MIME info?
-			sMsgSortedUriLst = this.ProcessOldOE(sMsgUriLst, nMsgCnt);
+		try {
+			var sMsgSortedUriLst = this.ProcessMIME(sMsgUriLst, nMsgCnt);
 			if (sMsgSortedUriLst == null) {
-				var sErrMsg = document.getElementById('JoinNGBundle').getString('InvalidMessages');
-				alert(sErrMsg);
-				return -1;
+				// Maybe this message is from old OE and has no MIME info?
+				sMsgSortedUriLst = this.ProcessOldOE(sMsgUriLst, nMsgCnt);
+				if (sMsgSortedUriLst == null) {
+					var sErrMsg = document.getElementById('JoinNGBundle').getString('InvalidMessages');
+					alert(sErrMsg);
+					return -1;
+				}
 			}
+		}
+		catch (e) {
+			alert(e);
+			return -1;
 		}
 
 		MyDump("------------------------------\n");

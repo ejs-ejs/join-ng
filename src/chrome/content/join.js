@@ -415,6 +415,8 @@ var Join = {
 
 			var sErrMsg = document.getElementById('JoinNGBundle').getString('TooFewMessages');
 			alert(sErrMsg);
+			joinProcess.state = Components.interfaces.nsIActivityProcess.STATE_CANCELED;
+			gActivityManager.removeActivity(joinProcess.id);
 			return -1;
 		}
 
@@ -431,12 +433,16 @@ var Join = {
 				if (sMsgSortedUriLst == null) {
 					var sErrMsg = document.getElementById('JoinNGBundle').getString('InvalidMessages');
 					alert(sErrMsg);
+					joinProcess.state = Components.interfaces.nsIActivityProcess.STATE_CANCELED;
+					gActivityManager.removeActivity(joinProcess.id);
 					return -1;
 				}
 			}
 		}
 		catch (e) {
 			alert(e);
+			joinProcess.state = Components.interfaces.nsIActivityProcess.STATE_CANCELED;
+			gActivityManager.removeActivity(joinProcess.id);
 			return -1;
 		}
 

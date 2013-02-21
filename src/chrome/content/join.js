@@ -336,7 +336,7 @@ var Join = {
 			sTbHead = this.GenerateOldOEHeader(sFirstMsgUri);
 
 		// Try to improve subject by removing [1/99] ant the end of it
-		sTbHead = sTbHead.replace(/(^Subject: .*)\s*\[\d+\/\d+\]$/m, "$1");
+		sTbHead = sTbHead.replace(/(^Subject: [\s\S]*)\s*\[\d+\/\d+\]$/m, "$1");
 
 		// X-Account-Key
 		if (sTbHead.indexOf("X-Account-Key") < 0) {

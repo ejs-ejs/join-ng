@@ -508,7 +508,7 @@ var Join = {
  
 		joinEvent.contextType = joinProcess.contextType; // optional
 		joinEvent.contextObj = joinProcess.contextObj;   // optional
-              
+
 		gActivityManager.addActivity(joinEvent);
 
 		return 0;
@@ -569,24 +569,24 @@ var Join = {
 
 
 	//////////////////////////////////////////////////
-	///  メッセージ URI からメッセージヘッダを取得する
-	///  (引数)
-	///  sMsgUri:String メッセージ URI
-	///  (戻り値)
-	///  :String メッセージヘッダ。エラーにより中断した場合、空文字列。
+	///  Get message header from message URI
+	///  (Arguments)
+	///  sMsgUri:String Message URI.
+	///  (Return)
+	///  :String Return message header. If aborted by errors, return empty string.
 	//////////////////////////////////////////////////
 	GetHeader : function ( sMsgUri )
 	{
-		// おまじない
+		// Kind of "boilerplate code"
 		var oMsgStream = Components.classes["@mozilla.org/network/sync-stream-listener;1"].createInstance();
 		var oInStream = oMsgStream.QueryInterface(Components.interfaces.nsIInputStream);
 
-		// おまじない
+		// Kind of "boilerplate code"
 		var oScrIn = Components.classes["@mozilla.org/scriptableinputstream;1"].createInstance();
 		var oScrInStream = oScrIn.QueryInterface(Components.interfaces.nsIScriptableInputStream);
 		oScrInStream.init(oInStream);
 
-		// おまじない
+		// Kind of "boilerplate code"
 		var oMsgServ = messenger.messageServiceFromURI(sMsgUri);
 		try {
 			oMsgServ.streamMessage(sMsgUri, oMsgStream, msgWindow, null, false, null);
@@ -595,13 +595,13 @@ var Join = {
 			return '';
 		}
 
-		// メッセージデータを取得する
+		// Get message data
 		var sMsgHead = '';
 		oScrInStream.available();
 		while ( oScrInStream.available() ) {
 			sMsgHead += oScrInStream.read(1000);
 
-			// 最初の空行までの文字列を返す
+			// Return string splited at first empty line
 			var nSpilitter = sMsgHead.search(/\r?\n\r?\n/);
 			if ( nSpilitter != -1 ) {
 				sMsgHead = sMsgHead.substr(0, nSpilitter);
@@ -614,16 +614,16 @@ var Join = {
 
 	GetMessage : function ( sMsgUri )
 	{
-		// おまじない
+		// Kind of "boilerplate code"
 		var oMsgStream = Components.classes["@mozilla.org/network/sync-stream-listener;1"].createInstance();
 		var oInStream = oMsgStream.QueryInterface(Components.interfaces.nsIInputStream);
 
-		// おまじない
+		// Kind of "boilerplate code"
 		var oScrIn = Components.classes["@mozilla.org/scriptableinputstream;1"].createInstance();
 		var oScrInStream = oScrIn.QueryInterface(Components.interfaces.nsIScriptableInputStream);
 		oScrInStream.init(oInStream);
 
-		// おまじない
+		// Kind of "boilerplate code"
 		var oMsgServ = messenger.messageServiceFromURI(sMsgUri);
 		try {
 			oMsgServ.streamMessage(sMsgUri, oMsgStream, msgWindow, null, false, null);
@@ -632,7 +632,7 @@ var Join = {
 			return '';
 		}
 
-		// メッセージデータを取得する
+		// Get message data
 		var sMsgData = '';
 		oScrInStream.available();
 

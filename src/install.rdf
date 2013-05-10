@@ -6,7 +6,7 @@
 		
 		<em:id>join-ng@paulius.zaleckas</em:id>
 		<em:name>Join-NG</em:name>
-		<em:version>0.8.2</em:version>
+		<em:version>0.8.3</em:version>
 		<em:type>2</em:type>
 		<em:description>Restore message/partial messages.</em:description>
 		<em:creator>Paulius Zaleckas</em:creator>

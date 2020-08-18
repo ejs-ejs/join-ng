@@ -43,15 +43,15 @@ on:
         - uses: actions/checkout@v2
         - name: Make an Thunderbird add-in
           run: |
-            echo "$[INPUT_ADDIN_NAME]_$INPUT_MAJOR.${{ inputs.minor }}-${INPUT_APP)"
-            cd src && zip -r ../$[INPUT_ADDIN_NAME]_$INPUT_MAJOR.${{ inputs.minor }}-${INPUT_APP).xpi *
+            echo "$[INPUT_ADDIN_NAME]_$INPUT_MAJOR.${{ github.event.inputs.minor }}-${INPUT_APP)"
+            cd src && zip -r ../$[INPUT_ADDIN_NAME]_$INPUT_MAJOR.${{ github.event.inputs.minor }}-${INPUT_APP).xpi *
         - name: Commit file
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git pull
-          git add $[INPUT_ADDIN_NAME]_$INPUT_MAJOR.${{ inputs.minor }}-${INPUT_APP).xpi
-          git commit -m "$[INPUT_ADDIN_NAME]_$INPUT_MAJOR.${{ inputs.minor }}-${INPUT_APP).xpi created" -a
+          git add $[INPUT_ADDIN_NAME]_$INPUT_MAJOR.${{ github.event.inputs.minor }}-${INPUT_APP).xpi
+          git commit -m "$[INPUT_ADDIN_NAME]_$INPUT_MAJOR.${{ github.event.inputs.minor }}-${INPUT_APP).xpi created" -a
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:

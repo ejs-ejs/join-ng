@@ -8,19 +8,36 @@ on:
   workflow_dispatch:
     # Inputs the workflow accepts.
     inputs:
-      name:
+      ADDIN_NAME:
         # Friendly description to be shown in the UI instead of 'name'
-        description: 'Create XPI file'
+        description: 'Add-in name'
         # Default value if no value is explicitly provided
-        default: '0.8.3'
+        default: 'JoinNG'
         # Input has to be provided for the workflow to run
         required: true
+      MAJOR:
+        # Friendly description to be shown in the UI instead of 'name'
+        description: 'Major revision number'
+        # Default value if no value is explicitly provided
+        default: '0'
+        # Input has to be provided for the workflow to run
+        required: true
+      MINOR:
+        description: 'Minor revision number'
+        default: '8.3'
+        required: true
+    APP:
+        description: 'Application flavor'
+        default: 'tb'
+        required: true
+    
+      
 
-env:
-   ADDIN_NAME: JoinNG
-   MAJOR: 0
-   MINOR: 8.3
-   APP: tb
+#env:
+#   ADDIN_NAME: JoinNG
+#   MAJOR: 0
+#   MINOR: 8.3
+#   APP: tb
 
 jobs:
   build:

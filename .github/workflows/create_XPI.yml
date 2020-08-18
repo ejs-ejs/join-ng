@@ -6,11 +6,6 @@ name: Create XPI
 on:
   workflow_dispatch:
   
-  env:
-    ADDIN_NAME: JoinNG
-    MAJOR: 0
-    MINOR: 8.3
-    APP: tb
 
 # Inputs the workflow accepts.
   inputs:
@@ -35,6 +30,11 @@ on:
       required: true
       
   jobs:
+    env:
+      ADDIN_NAME: JoinNG
+      MAJOR: 0
+      MINOR: 8.3
+      APP: tb
     build:
       runs-on: ubuntu-latest
       steps:

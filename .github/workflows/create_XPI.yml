@@ -5,7 +5,8 @@ name: Create XPI
 # or API.
 on:
   workflow_dispatch:
-  
+
+jobs:
 
 # Inputs the workflow accepts.
   inputs:
@@ -29,7 +30,7 @@ on:
       default: 'tb'
       required: true
       
-  jobs:
+  
     env:
       ADDIN_NAME: JoinNG
       MAJOR: 0

@@ -19,14 +19,17 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 runs:
   using: "composite"
+  uses = "jcblw/bash@master"
   # This creates an XPI file
   XPI:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     # Runs a single command using the runners shell
     - name: Create XPI
-      run: 'cd "${{ github.action_path }}/src" && zip -r "${{ github.action_path }}/join-ng.xpi" *'
-      shell: bash
+      #args: ["cat <<<$MY_VAR > file.csv"]
+      args: ["cd ${{ github.action_path }}/src && zip -r ${{ github.action_path }}/join-ng.xpi *"]
+      #run: 'cd "${{ github.action_path }}/src" && zip -r "${{ github.action_path }}/join-ng.xpi" *'
+      #shell: bash
       
  Clean:
     

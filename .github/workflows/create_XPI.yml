@@ -5,9 +5,6 @@ name: Create XPI
 # or API.
 on:
   workflow_dispatch:
-
-jobs:
-
 # Inputs the workflow accepts.
   inputs:
     addin_name:
@@ -29,13 +26,13 @@ jobs:
       description: 'Application flavor'
       default: 'tb'
       required: true
-      
-  
-    env:
-      ADDIN_NAME: JoinNG
-      MAJOR: 0
-      MINOR: 8.3
-      APP: tb
+env:
+    ADDIN_NAME: JoinNG
+    MAJOR: 0
+    MINOR: 8.3
+    APP: tb
+
+jobs:
     build:
       runs-on: ubuntu-latest
       steps:

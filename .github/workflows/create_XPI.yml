@@ -32,7 +32,6 @@ runs:
       #shell: bash
       
  Clean:
-    
     #runs-on: ubuntu-latest
     steps:
     - name: Clean XPI

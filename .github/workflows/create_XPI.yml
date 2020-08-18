@@ -40,7 +40,7 @@ jobs:
         git add $ADDIN_NAME_$MAJOR.$MINOR-$APP.xpi
         git commit -m "$ADDIN_NAME_$MAJOR.$MINOR-$APP.xpi created" -a
     - name: Push changes
-      uses: ad-m/github-push-action@noJAR
+      uses: ad-m/github-push-action
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
 

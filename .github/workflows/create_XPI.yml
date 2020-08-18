@@ -31,7 +31,8 @@ jobs:
     - uses: actions/checkout@v2
     - name: Make an Thunderbird add-in
       run: |
-        zip -r ${ADDIN_NAME}_$MAJOR.$MINOR-$APP.xpi src/*
+        cd crc
+        zip -r ../${ADDIN_NAME}_$MAJOR.$MINOR-$APP.xpi *
     - name: Commit file
       run: |
         git config --local user.email "action@github.com"

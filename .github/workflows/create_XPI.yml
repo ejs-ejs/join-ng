@@ -17,21 +17,22 @@ on:
         required: true
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
-jobs:
+runs:
+  using: "composite"
   # This creates an XPI file
   XPI:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
-
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     # Runs a single command using the runners shell
     - name: Create XPI
       run: 'cd "${{ github.action_path }}/src" && zip -r "${{ github.action_path }}/join-ng.xpi" *'
+      shell: bash
       
  Clean:
-    runs-on: ubuntu-latest
+    
+    #runs-on: ubuntu-latest
     steps:
     - name: Clean XPI
       run: rm -f join-ng.xpi
+      shell: bash
       

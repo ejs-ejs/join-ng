@@ -27,7 +27,7 @@ jobs:
     steps:
     # Runs a single command using the runners shell
     - name: Create XPI
-      run: cd src && zip -r ../join-ng.xpi *
+      run: 'cd "${{ github.action_path }}/src" && zip -r "${{ github.action_path }}/join-ng.xpi" *'
       
  Clean:
     runs-on: ubuntu-latest

@@ -17,7 +17,7 @@ on:
         required: true
       minor:
         description: 'Minor revision number'
-        default: '8.4'
+        default: '8.6'
         required: true
       app:
         description: 'Application flavor'

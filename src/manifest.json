@@ -14,7 +14,7 @@
   
   
   "legacy": {
-    "type": "bootstrap",
+    "type": "xul",
     "options": {
       "page": "chrome://join-ng/content/joinOptions.xul", 
       "open_in_tab": true

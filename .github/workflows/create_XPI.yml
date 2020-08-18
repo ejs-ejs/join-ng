@@ -49,8 +49,7 @@ jobs:
             git config --local user.name "GitHub Action"
             git pull
             git add {ADDIN_NAME}_${MAJOR}.${MINOR}-${APP}.xpi
-#            git commit -m "{ADDIN_NAME}_${MAJOR}.${MINOR}-${APP}.xpi created" -a
-            git commit -m "${ADDIN_NAME}_$MAJOR.$MINOR-$APP.xpi created"
+            git commit -m "${ADDIN_NAME}_$MAJOR.$MINOR-$APP.xpi created" -a
         - name: Push changes
           uses: ad-m/github-push-action@master
           with:

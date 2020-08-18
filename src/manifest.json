@@ -2,7 +2,8 @@
   "manifest_version": 2,
   "applications": {
     "gecko": {
-      "id": "join-ng@paulius.zaleckas"
+      "id": "join-ng@paulius.zaleckas",
+      "strict_min_version": "68.0"
     }
   },
   "name": "Join-NG",
@@ -11,11 +12,9 @@
   "version": "0.8.4",
   "author": "Paulius Zaleckas, Munekazu SHINKAI (original "join"), Eugenijus Januškevičius (lt-LT translator)",
   
-  "icons": {
-    "32": "skin/icon.png"
-  },
+  
   "legacy": {
-    "type": "xul",
+    "type": "bootstrap",
     "options": {
       "page": "chrome://join-ng/content/joinOptions.xul", 
       "open_in_tab": true

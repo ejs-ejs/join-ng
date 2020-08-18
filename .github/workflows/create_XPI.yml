@@ -44,7 +44,7 @@ jobs:
             git config --local user.email "action@github.com"
             git config --local user.name "GitHub Action"
             git pull
-            git add ${{ github.event.inputs.addin_name }}_${{ github.event.inputs.major }}.${{ github.event.inputs.minor }}-${{ github.event.inputs.app }}.xpi
+            git add ${{ github.event.inputs.addin_name }}_${{ github.event.inputs.major }}.${{ github.event.inputs.minor }}-${{ github.event.inputs.app }}.xpi -f
             git commit -m "${{ github.event.inputs.addin_name }}_${{ github.event.inputs.major }}.${{ github.event.inputs.minor }}-${{ github.event.inputs.app }}.xpi created" -a
         - name: Push changes
           uses: ad-m/github-push-action@master

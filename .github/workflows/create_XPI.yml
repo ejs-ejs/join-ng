@@ -50,7 +50,7 @@ on:
             git pull
             git add ${INPUT_ADDIN_NAME}_$INPUT_MAJOR.${{ github.event.inputs.minor }}-${INPUT_APP}.xpi
             # git commit -m "${{ github.event.inputs.addin_name }}_${{ github.event.inputs.major }}.${{ github.event.inputs.minor }}-${INPUT_APP}.xpi created" -a
-            git commit -m "${ADDIN_NAME}_$INPUT_MAJOR.$$INPUT_MINOR-$INPUT_APP.xpi created"
+            git commit -m "${ADDIN_NAME}_$MAJOR.$MINOR-$APP.xpi created"
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:

@@ -1,5 +1,3 @@
-# This is a basic workflow that is manually triggered
-
 name: Create XPI
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
@@ -8,11 +6,11 @@ on:
 # Inputs the workflow accepts.
     inputs:
       addin_name:
-      # Friendly description to be shown in the UI instead of 'name'
+#       Friendly description to be shown in the UI instead of 'name'
       description: 'Add-in name'
-      # Default value if no value is explicitly provided
+#       Default value if no value is explicitly provided
       default: 'JoinNG'
-      # Input has to be provided for the workflow to run
+#       Input has to be provided for the workflow to run
       required: true
     major:
       description: 'Major revision number'
@@ -26,6 +24,7 @@ on:
       description: 'Application flavor'
       default: 'tb'
       required: true
+      
 env:
     ADDIN_NAME: JoinNG
     MAJOR: 0

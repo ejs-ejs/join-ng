@@ -26,7 +26,7 @@ on:
         description: 'Minor revision number'
         default: '8.3'
         required: true
-    APP:
+     APP:
         description: 'Application flavor'
         default: 'tb'
         required: true

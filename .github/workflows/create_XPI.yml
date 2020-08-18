@@ -24,11 +24,11 @@ on:
         default: 'tb'
         required: true
       
-env:
-    ADDIN_NAME: JoinNG
-    MAJOR: 0
-    MINOR: 8.3
-    APP: tb
+#env:
+#    ADDIN_NAME: JoinNG
+#    MAJOR: 0
+#    MINOR: 8.3
+#    APP: tb
 
 jobs:
     build:
@@ -38,14 +38,14 @@ jobs:
         - name: Make an Thunderbird add-in
           run: |
             echo "Creating ${{ github.event.inputs.addin_name }}_${{ github.event.inputs.major }}.${{ github.event.inputs.minor }}-${{ github.event.inputs.app }}.xpi"
-            cd src && zip -r ../{ADDIN_NAME}_${MAJOR}.${MINOR}-${APP}.xpi *
+            cd src && zip -r ../${{ github.event.inputs.addin_name }}_${{ github.event.inputs.major }}.${{ github.event.inputs.minor }}-${{ github.event.inputs.app }}.xpi *
         - name: Commit file
           run: |
             git config --local user.email "action@github.com"
             git config --local user.name "GitHub Action"
             git pull
-            git add {ADDIN_NAME}_${MAJOR}.${MINOR}-${APP}.xpi
-            git commit -m "${ADDIN_NAME}_$MAJOR.$MINOR-$APP.xpi created" -a
+            git add ${{ github.event.inputs.addin_name }}_${{ github.event.inputs.major }}.${{ github.event.inputs.minor }}-${{ github.event.inputs.app }}.xpi
+            git commit -m "${{ github.event.inputs.addin_name }}_${{ github.event.inputs.major }}.${{ github.event.inputs.minor }}-${{ github.event.inputs.app }}.xpi created" -a
         - name: Push changes
           uses: ad-m/github-push-action@master
           with:

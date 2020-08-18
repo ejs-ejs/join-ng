@@ -8,26 +8,26 @@ on:
   
     
 # Inputs the workflow accepts.
-  inputs:
-    addin_name:
+#  inputs:
+#    addin_name:
       # Friendly description to be shown in the UI instead of 'name'
-      description: 'Add-in name'
+#      description: 'Add-in name'
       # Default value if no value is explicitly provided
-      default: 'JoinNG'
+#      default: 'JoinNG'
       # Input has to be provided for the workflow to run
-      required: true
-    major:
-      description: 'Major revision number'
-      default: '0'
-      required: true
-    minor:
-      description: 'Minor revision number'
-      default: '8.3'
-      required: true
-    app:
-      description: 'Application flavor'
-      default: 'tb'
-      required: true
+#      required: true
+#    major:
+#      description: 'Major revision number'
+#      default: '0'
+#      required: true
+#    minor:
+#      description: 'Minor revision number'
+#      default: '8.3'
+#      required: true
+#    app:
+#      description: 'Application flavor'
+#      default: 'tb'
+#      required: true
 env:
     ADDIN_NAME: JoinNG
     MAJOR: 0
@@ -41,15 +41,16 @@ jobs:
         - uses: actions/checkout@v2
         - name: Make an Thunderbird add-in
           run: |
-            echo "${INPUT_ADDIN_NAME}_${INPUT_MAJOR}.${{ github.event.inputs.minor }}-${INPUT_APP}"
-            cd src && zip -r ../${INPUT_ADDIN_NAME}_$INPUT_MAJOR.${{ github.event.inputs.minor }}-${INPUT_APP}.xpi *
+#            echo "${INPUT_ADDIN_NAME}_${INPUT_MAJOR}.${{ github.event.inputs.minor }}-${INPUT_APP}"
+            echo "Creating ${ADDIN_NAME}_${MAJOR}.${MINOR}-${APP}.xpi"
+            cd src && zip -r ../{ADDIN_NAME}_${MAJOR}.${MINOR}-${APP}.xpi *
         - name: Commit file
           run: |
             git config --local user.email "action@github.com"
             git config --local user.name "GitHub Action"
             git pull
-            git add ${INPUT_ADDIN_NAME}_$INPUT_MAJOR.${{ github.event.inputs.minor }}-${INPUT_APP}.xpi
-            # git commit -m "${{ github.event.inputs.addin_name }}_${{ github.event.inputs.major }}.${{ github.event.inputs.minor }}-${INPUT_APP}.xpi created" -a
+            git add {ADDIN_NAME}_${MAJOR}.${MINOR}-${APP}.xpi
+#            git commit -m "{ADDIN_NAME}_${MAJOR}.${MINOR}-${APP}.xpi created" -a
             git commit -m "${ADDIN_NAME}_$MAJOR.$MINOR-$APP.xpi created"
         - name: Push changes
           uses: ad-m/github-push-action@master

@@ -30,7 +30,7 @@ on:
     
       
 
-#env:
+env:
    ADDIN_NAME: JoinNG
    MAJOR: 0
    MINOR: 8.3

@@ -16,25 +16,32 @@ on:
         # Input has to be provided for the workflow to run
         required: true
 
+env:
+   ADDIN_NAME: JoinNG
+   MAJOR: 0
+   MINOR: 8.3
+   APP: tb
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Make an Thunderbird add-in
+      run: |
+        zip -r ${ADDIN_NAME}_$MAJOR.$MINOR-$APP.xpi src/*
+    - name: Commit file
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git pull
+        git add $ADDIN_NAME_$MAJOR.$MINOR-$APP.xpi
+        git commit -m "$ADDIN_NAME_$MAJOR.$MINOR-$APP.xpi created" -a
+    - name: Push changes
+      uses: ad-m/github-push-action@noJAR
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
-runs:
-  using: "composite"
-  using: "jcblw/bash@master"
-  # This creates an XPI file
-  XPI:
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-    # Runs a single command using the runners shell
-    - name: Create XPI
-      #args: ["cat <<<$MY_VAR > file.csv"]
-      args: ["cd ${{ github.action_path }}/src && zip -r ${{ github.action_path }}/join-ng.xpi *"]
-      #run: 'cd "${{ github.action_path }}/src" && zip -r "${{ github.action_path }}/join-ng.xpi" *'
-      #shell: bash
-      
- Clean:
-    #runs-on: ubuntu-latest
-    steps:
-    - name: Clean XPI
-      run: rm -f join-ng.xpi
-      shell: bash
-      

@@ -43,6 +43,7 @@ on:
         - uses: actions/checkout@v2
         - name: Make an Thunderbird add-in
           run: |
+            echo "$[INPUT_ADDIN_NAME]_$INPUT_MAJOR.${{ inputs.minor }}-${INPUT_APP)"
             cd src && zip -r ../$[INPUT_ADDIN_NAME]_$INPUT_MAJOR.${{ inputs.minor }}-${INPUT_APP).xpi *
         - name: Commit file
         run: |

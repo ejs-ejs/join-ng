@@ -5,8 +5,6 @@ name: Create XPI
 # or API.
 on:
   workflow_dispatch:
-  
-    
 # Inputs the workflow accepts.
     inputs:
       addin_name:

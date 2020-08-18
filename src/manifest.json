@@ -1,0 +1,24 @@
+{
+  "manifest_version": 2,
+  "applications": {
+    "gecko": {
+      "id": "join-ng@paulius.zaleckas"
+    }
+  },
+  "name": "Join-NG",
+  "description": "Restore message/partial messages.",
+  "homepage_url": "https://github.com/pauliuszaleckas/join-ng",
+  "version": "0.8.4",
+  "author": "Paulius Zaleckas, Munekazu SHINKAI (original "join"), Eugenijus Januškevičius (lt-LT translator)",
+  
+  "icons": {
+    "32": "skin/icon.png"
+  },
+  "legacy": {
+    "type": "xul",
+    "options": {
+      "page": "chrome://join-ng/content/joinOptions.xul", 
+      "open_in_tab": true
+    }
+  }
+}

@@ -3,7 +3,7 @@
   "applications": {
     "gecko": {
       "id": "join-ng@paulius.zaleckas",
-      "strict_min_version": "68.0"
+      "strict_min_version": "78.0"
     }
   },
   "name": "Join-NG",
@@ -12,13 +12,13 @@
   "version": "0.8.6",
   "author": "Paulius Zaleckas, Munekazu SHINKAI (original 'join'), Eugenijus Januškevičius (lt-LT translator)",
   
-  "permissions": ["menus", "menus.overrideContext"],
-  
-  "legacy": {
-    "type": "xul",
-    "options": {
-      "page": "chrome://join-ng/content/joinOptions.xul", 
-      "open_in_tab": true
-    }
-  }
+ // "permissions": ["menus", "menus.overrideContext"],
+ // 
+ // "legacy": {
+ //   "type": "xul",
+ //   "options": {
+ //     "page": "chrome://join-ng/content/joinOptions.xul", 
+ //     "open_in_tab": true
+ //   }
+ // }
 }

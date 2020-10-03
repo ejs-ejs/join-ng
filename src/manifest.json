@@ -12,10 +12,7 @@
   "version": "0.8.6",
   "author": "Paulius Zaleckas, Munekazu SHINKAI (original 'join'), Eugenijus Januškevičius (lt-LT translator)",
   
-  "permissions": {
-  "menus",
-  "menus.overrideContext"
-  }
+  "permissions": ["menus", "menus.overrideContext"],
   
   "legacy": {
     "type": "xul",

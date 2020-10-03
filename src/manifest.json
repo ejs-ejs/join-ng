@@ -27,6 +27,10 @@
     ]
   }
   
-  "permissions": ["menus", "menus.overrideContext"]
+  "permissions": ["menus", 
+    "menus.overrideContext"
+	],
+	
+  "default_locale": "en-US"
  
 }

@@ -1,0 +1,41 @@
+{
+  "extensionDescription": {
+    "message": "Apjungia dalines žinutes."
+  },
+  "extensionName": {
+    "message": "Join-NG"
+  },
+  "folder": {
+    "message": "Apjungtos"
+  },
+  "TooFewMessages": {
+   "message": "Per mažai žinučių."
+   },
+  "InvalidMessages": {
+    "message": "Parinktos neteisingos žinutės."
+	},
+  "NotPartialMessage": {
+    "message": "Parinktos neteisingos žinutės:\n 'Content-Type' parametras ne 'message/partial'"
+	},
+  "MissingParameter": {
+    "message": "Parinktos neteisingos žinutės:\n netinkami parametrai 'message/partial'"
+	},
+  "UnmatchTotal": {
+    "message": "Parinktų 'message/partial' žinučių skaičius neatinka nurodytam parametre 'total'."
+	},
+  "UnmatchMessageID": {
+    "message": "Neteisingas Message-ID."
+	},
+  "UnmatchMessageSeq": {
+    "message": "Neteisingas žinučių eiliškumas.\nTrūksta kai kurių dalių arba jos kartojasi."
+	},
+  "JoinInProgress": {
+    "message": "Apjungiamos žinutės…"
+	},
+  "JoinedMessage": {
+    "message": "Apjungta žinutė:"
+	},
+	"join-ng.label": {
+		"message": "Apjungti"
+	}
+}

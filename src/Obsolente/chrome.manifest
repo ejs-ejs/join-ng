@@ -1,0 +1,6 @@
+content join-ng chrome/content/
+overlay chrome://messenger/content/messenger.xul chrome://join-ng/content/joinOverlay.xul
+
+locale join-ng ja-JP chrome/locale/ja-JP/
+locale join-ng en-US chrome/locale/en-US/
+locale join-ng lt-LT chrome/locale/lt-LT/

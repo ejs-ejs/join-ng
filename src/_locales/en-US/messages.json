@@ -1,0 +1,41 @@
+{
+  "extensionDescription": {
+    "message": "Restore message/partial messages"
+  },
+  "extensionName": {
+    "message": "DropBox Uploader"
+  },
+  "folder": {
+    "message": "Joined"
+  },
+  "TooFewMessages": {
+   "message": "Too few messages."
+   },
+  "InvalidMessages": {
+    "message": "Invalid messages are selected."
+	},
+  "NotPartialMessage": {
+    "message": "Invalid messages are selected.\n(Content-Type isn't 'message/partial')"
+	},
+  "MissingParameter": {
+    "message": "Invalid messages are selected.\n(Parameters for 'message/partial' are missing)"
+	},
+  "UnmatchTotal": {
+    "message": "The number of selected messages doesn't match the 'total' of the parameter for 'message/partial'."
+	},
+  "UnmatchMessageID": {
+    "message": "Invalid Message-ID."
+	},
+  "UnmatchMessageSeq": {
+    "message": "Invalid sequence of messages.\nSome part is missing or duplicate."
+	},
+  "JoinInProgress": {
+    "message": "Joining messages…"
+	},
+  "JoinedMessage": {
+    "message": "Joined message:"
+	},
+	"join-ng.label": {
+		"message": "Join"
+	}
+}

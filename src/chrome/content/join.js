@@ -27,9 +27,9 @@
 ///
 //////////////////////////////////////////////////
 
-const nsIAP = Components.interfaces.nsIActivityProcess;
-const nsIAE = Components.interfaces.nsIActivityEvent;
-const nsIAM = Components.interfaces.nsIActivityManager;
+//const nsIAP = Components.interfaces.nsIActivityProcess;
+//const nsIAE = Components.interfaces.nsIActivityEvent;
+//const nsIAM = Components.interfaces.nsIActivityManager;
 
 //////////////////////////////////////////////////
 ///  Displays debug info on console.
@@ -93,7 +93,12 @@ var Join = {
 			MyDump("The number of selected messages doesn't match the 'total' ... abort\n");
 			MyDump("==============================\n");
 
-			var sErrMsg = document.getElementById('JoinNGBundle').getString('UnmatchTotal');
+			// i18n patch
+			//
+			// var sErrMsg = document.getElementById('JoinNGBundle').getString('UnmatchTotal');
+			var sErrMsg = "Unmatch Total";
+			//
+			
 			var sErrDtl = "nMsgCnt=" + nMsgCnt + "\n" +
 			              "nTotal=" + nTotal;
 			throw sErrMsg + "\n\n" + sErrDtl;
@@ -105,8 +110,13 @@ var Join = {
 			if (Number(oMsgInfoLst[nMsgIdx].number) != (nMsgIdx + 1)) {
 				MyDump("Message sequence No." + nMsgIdx + " does not match real No." + oMsgInfoLst[nMsgIdx].number + "\n");
 				MyDump("==============================\n");
-
-				var sErrMsg = document.getElementById('JoinNGBundle').getString('UnmatchMessageSeq');
+				
+				// i18n patch
+				//
+				//var sErrMsg = document.getElementById('JoinNGBundle').getString('UnmatchMessageSeq');
+				var sErrMsg = "Unmatch Message Seq";
+				//
+				
 				throw sErrMsg;
 			}
 		}
@@ -119,7 +129,12 @@ var Join = {
 				MyDump("Message No." + nMsgIdx + ": Invalid Message-ID ... abort\n");
 				MyDump("==============================\n");
 
-				var sErrMsg = document.getElementById('JoinNGBundle').getString('UnmatchMessageID');
+				// i18n patch
+				//
+				//var sErrMsg = document.getElementById('JoinNGBundle').getString('UnmatchMessageID');
+				var sErrMsg = "Unmatch Message ID";
+				//
+				
 				var sErrDtl = "nMsgIdx=" + nMsgIdx + "\n" +
 				              "sId=" + sId + "\n" +
 				              "oMsgInfoLst[nMsgIdx].id=" + oMsgInfoLst[nMsgIdx].id;
@@ -159,7 +174,12 @@ var Join = {
 				MyDump("Message No." + nMsgIdx + ": Content-Type isn't 'message/partial' ... abort\n");
 				MyDump("==============================\n");
 
-				var sErrMsg = document.getElementById('JoinNGBundle').getString('NotPartialMessage');
+				// i18n patch
+				//
+				//var sErrMsg = document.getElementById('JoinNGBundle').getString('NotPartialMessage');
+				var sErrMsg = "Not a Partial Message";
+				//
+				
 				var sErrDtl = "nMsgIdx=" + nMsgIdx + "\n" +
 				              "sMsgType=" + sMsgType;
 				throw sErrMsg + "\n\n" + sErrDtl;
@@ -191,7 +211,12 @@ var Join = {
 				MyDump("Message No." + nMsgIdx + ": " + e + " ... abort\n");
 				MyDump("==============================\n");
 
-				var sErrMsg = document.getElementById('JoinNGBundle').getString('MissingParameter');
+				// i18n patch
+				//
+				//var sErrMsg = document.getElementById('JoinNGBundle').getString('MissingParameter');
+				var sErrMsg = "MissingParameter";
+				//
+				
 				var sErrDtl = "nMsgIdx=" + nMsgIdx + "\n" +
 				              "sMsgType=" + sMsgType;
 				throw sErrMsg + "\n\n" + e + "\n" + sErrDtl;
@@ -388,22 +413,49 @@ var Join = {
 	//////////////////////////////////////////////////
 	Join : function ()
 	{
+//		var myapi = class extends ExtensionCommon.ExtensionAPI {
+//			getAPI(context) {
+//				let extension = context.extension;
+//				... 
+//			}
+//		}
+
+		console.log('Join-NG: bootstrap started');
+		var nsIAP = Components.interfaces.nsIActivityProcess;
+		var nsIAE = Components.interfaces.nsIActivityEvent;
+		var nsIAM = Components.interfaces.nsIActivityManager;
+
 		let gActivityManager = Components.classes["@mozilla.org/activity-manager;1"].getService(nsIAM);
 		let joinProcess = Components.classes["@mozilla.org/activity-process;1"].createInstance(nsIAP);
+		
+		console.log('Join-NG: bootstrap ended');
 
 		MyDump("==============================\n");
 		MyDump("## Start join process\n");
+		console.log('Join-NG: Start join process');
 
-		joinProcess.init(document.getElementById('JoinNGBundle').getString('JoinInProgress'), null);
+		// i18n patch
+		//	//joinProcess.init(document.getElementById('JoinNGBundle').getString('JoinInProgress'), null);
+		
+		//let msgString = window.extension.localeData.localizeMessage("JoinInProgress");
+		//var msgString = messenger.i18n.getMessage("JoinInProgress");
+		var msgString = "Join In Progress";
+		//
+		
+		//console.log("Join-NG: localised string '" + msgString +"'");
+		joinProcess.init(msgString, null);
+		
 		joinProcess.contextType = "account";     // group this activity by account
 		joinProcess.contextObj = gFolderDisplay.displayedFolder.server;  // account in question
 
 		gActivityManager.addActivity(joinProcess);
 
-		joinProcess.setProgress(document.getElementById('JoinNGBundle').getString('JoinInProgress'), 0, 0);
+		//joinProcess.setProgress(document.getElementById('JoinNGBundle').getString('JoinInProgress'), 0, 0);
+		joinProcess.setProgress(msgString, 0, 0);
 
 		MyDump("------------------------------\n");
 		MyDump("## Get selected messages\n");
+		console.log('Join-NG: Get selected messages');
 
 		// Get URIs of selected messages
 		var sMsgUriLst = gFolderDisplay.selectedMessageUris;
@@ -412,8 +464,14 @@ var Join = {
 		if ( ( ! sMsgUriLst ) || ( sMsgUriLst.length < 2 ) ) {
 			MyDump("Too few messages ... abort\n");
 			MyDump("==============================\n");
+			console.log('Join-NG: Too few messages ... abort');
 
-			var sErrMsg = document.getElementById('JoinNGBundle').getString('TooFewMessages');
+			// i18n patch
+			//
+			//var sErrMsg = document.getElementById('JoinNGBundle').getString('TooFewMessages');
+			var sErrMsg = "Too Few Messages";
+			//
+			
 			alert(sErrMsg);
 			joinProcess.state = Components.interfaces.nsIActivityProcess.STATE_CANCELED;
 			gActivityManager.removeActivity(joinProcess.id);
@@ -431,7 +489,13 @@ var Join = {
 				// Maybe this message is from old OE and has no MIME info?
 				sMsgSortedUriLst = this.ProcessOldOE(sMsgUriLst, nMsgCnt);
 				if (sMsgSortedUriLst == null) {
-					var sErrMsg = document.getElementById('JoinNGBundle').getString('InvalidMessages');
+					
+					// i18n patch
+					//
+					// var sErrMsg = document.getElementById('JoinNGBundle').getString('InvalidMessages');
+					var sErrMsg = "InvalidMessages";
+					//
+					
 					alert(sErrMsg);
 					joinProcess.state = Components.interfaces.nsIActivityProcess.STATE_CANCELED;
 					gActivityManager.removeActivity(joinProcess.id);
@@ -448,10 +512,12 @@ var Join = {
 
 		MyDump("------------------------------\n");
 		MyDump("## Join messages\n");
+		console.log('Join-NG: Join messages');
 
 		var sMsgBody = '';
 
 		MyDump("<List cnt=" + nMsgCnt + ">\n");
+		console.log("<List cnt=" + nMsgCnt + ">");
 		var nMsgIdx;
 		for ( nMsgIdx = 0; nMsgIdx < nMsgCnt; nMsgIdx++ ) {
 			// Get the message URI
@@ -469,14 +535,17 @@ var Join = {
 			msgHdr.markRead(true);
 
 			MyDump("Message No." + nMsgIdx + ": done\n");
+			console.log("Join-NG: Message No." + nMsgIdx + ": done");
 		}
 
 		MyDump("------------------------------\n");
 		MyDump("## Add new message\n");
+		console.log("Join-NG: Add new message\n");
 
 		// Current folder we are in
 		var oMsgFolder = this.GetLocalFolder();
 		var oMsgLocalFolder = oMsgFolder.QueryInterface(Components.interfaces.nsIMsgLocalMailFolder);
+		console.log("Join-NG: Adding new message to " +  oMsgFolder);
 
 		// Thunderbird message header
 		var sTbHead = this.GenerateHeader(sMsgSortedUriLst[0], oMsgFolder);
@@ -500,7 +569,11 @@ var Join = {
 		var sSubject = sTbHead.match(/^Subject: (.*)/m)[1];
  
 		// Localization is omitted, initiator is omitted
-		joinEvent.init(document.getElementById('JoinNGBundle').getString('JoinedMessage') + " " + sSubject,
+		
+		// i18n patch
+		//
+		var msgString = "JoinedMessage";
+		joinEvent.init(msgString + " " + sSubject,
 			       null,
 			       null,
 			       joinProcess.startTime,  // start time

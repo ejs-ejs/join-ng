@@ -1,0 +1,41 @@
+{
+  "extensionDescription": {
+    "message": "message/partial 形式のメッセージを結合する"
+  },
+  "extensionName": {
+    "message": "DropBox Uploader"
+  },
+  "folder": {
+    "message": "結合済"
+  },
+  "TooFewMessages": {
+   "message": "メッセージが１つだけしか選択されていません。\nメッセージは複数選択されていなければなりません。"
+   },
+  "InvalidMessages": {
+    "message": "結合できないメッセージが選択されています。"
+	},
+  "NotPartialMessage": {
+    "message": "結合できないメッセージが選択されています。\n（Content-Type が 'message/partial' でない）"
+	},
+  "MissingParameter": {
+    "message": "不正なメッセージが選択されています。\n（'message/partial' のパラメータが取得できない）"
+	},
+  "UnmatchTotal": {
+    "message": "選択されたメッセージの個数と 'message/parial' のパラメータ 'total' とが一致しません。"
+	},
+  "UnmatchMessageID": {
+    "message": "メッセージの ID が一致しません。\n選択されたすべてのメッセージの ID は一致していなければなりません。"
+	},
+  "UnmatchMessageSeq": {
+    "message": "不正なメッセージが選択されています。\nいくつかのメッセージが足りていないか重複しています。"
+	},
+  "JoinInProgress": {
+    "message": "メッセージ結合中…"
+	},
+  "JoinedMessage": {
+    "message": "結合済メッセージ:"
+	},
+	"join-ng.label": {
+		"message": "選択したメッセージを結合"
+	}
+}

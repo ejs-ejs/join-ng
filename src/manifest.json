@@ -9,7 +9,7 @@
   "name": "Join-NG",
   "description": "Restore message/partial messages.",
   "homepage_url": "https://github.com/pauliuszaleckas/join-ng",
-  "version": "0.8.6",
+  "version": "0.8.7a",
   "author": "Paulius Zaleckas, Munekazu SHINKAI (original 'join'), Eugenijus Januškevičius (lt-LT translator)",
   "experiment_apis": {
     "WindowListener": {
@@ -20,16 +20,22 @@
         "script": "api/WindowListener/implementation.js"
       }
     }
-  }
+  },
+  
   "background": {
     "scripts": [
       "background.js"
     ]
-  }
+  },
   
   "permissions": ["menus", 
     "menus.overrideContext"
 	],
+	
+  "icons": {
+    "16": "chrome/content/skin/JoinNG-16.png",
+    "32": "chrome/content/skin/JoinNG-32.png"
+    },
 	
   "default_locale": "en-US"
  
